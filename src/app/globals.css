@@ -1,26 +1,361 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import './calendar.css';
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 142.1 76.2% 36.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 20% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 20% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 142.1 70.6% 45.3%;
+    --primary-foreground: 144.9 80.4% 10%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142.4 71.8% 29.2%;
+  }
+
+  h1 {
+    @apply text-3xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-gray-100;
+  }
+  h2 {
+    @apply text-2xl font-bold tracking-tight leading-snug text-gray-900 dark:text-gray-100;
+  }
+  h3 {
+    @apply text-xl font-semibold text-gray-900 dark:text-gray-100;
+  }
+  body {
+    @apply bg-white text-black;
+  }
+  table th {
+    @apply text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide;
+  }
+  table td {
+    @apply text-sm text-gray-900 dark:text-gray-100;
+  }
+  .meta-text {
+    @apply text-xs text-gray-500 dark:text-gray-400 font-medium;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Theme transition */
+.theme-transition {
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Dark mode specific styles */
+.dark {
+  color-scheme: dark;
+}
+
+.dark .bg-white {
+  @apply bg-gray-900;
+}
+
+.dark .text-gray-900 {
+  @apply text-gray-100;
+}
+
+.dark .text-gray-700 {
+  @apply text-gray-300;
+}
+
+.dark .text-gray-500 {
+  @apply text-gray-400;
+}
+
+.dark .border-gray-200 {
+  @apply border-gray-700;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  @apply hover:bg-gray-800/50;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-gray-800;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-gray-800/50;
+}
+
+.dark .shadow-md {
+  @apply shadow-lg shadow-black/20;
+}
+
+.dark .ring-gray-200 {
+  @apply ring-gray-700;
+}
+
+.dark .focus\:ring-gray-200:focus {
+  @apply focus:ring-gray-700;
+}
+
+.dark .divide-gray-200 {
+  @apply divide-gray-700;
+}
+
+.dark .placeholder-gray-400::placeholder {
+  @apply placeholder-gray-500;
+}
+
+/* Dark mode button styles */
+.dark .btn-primary {
+  @apply bg-green-600 hover:bg-green-700 text-white;
+}
+
+.dark .btn-secondary {
+  @apply bg-gray-700 hover:bg-gray-600 text-gray-100;
+}
+
+.dark .btn-outline {
+  @apply border-gray-600 text-gray-100 hover:bg-gray-700;
+}
+
+/* Dark mode input styles */
+.dark input,
+.dark select,
+.dark textarea {
+  @apply bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  @apply border-green-500 ring-green-500;
+}
+
+/* Dark mode table styles */
+.dark table {
+  @apply border-gray-700;
+}
+
+.dark th {
+  @apply bg-gray-800 text-gray-300;
+}
+
+.dark td {
+  @apply border-gray-700;
+}
+
+.dark tr:hover {
+  @apply bg-gray-800/50;
+}
+
+/* Dark mode card styles */
+.dark .card {
+  @apply bg-gray-900 border-gray-700;
+}
+
+/* Dark mode badge styles */
+.dark .badge-success {
+  @apply bg-green-900/30 text-green-400;
+}
+
+.dark .badge-error {
+  @apply bg-red-900/30 text-red-400;
+}
+
+/* Dark mode tooltip styles */
+.dark .tooltip {
+  @apply bg-gray-800 text-gray-100 border-gray-700;
+}
+
+/* Animation styles */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+.animate-fade-out {
+  animation: fade-out 0.3s ease-in-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-in-out;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.3s ease-in-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-in-out;
+}
+
+.animate-scale-out {
+  animation: scale-out 0.2s ease-in-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-in-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-in-out;
+}
+
+.animate-slide-out-left {
+  animation: slide-out-left 0.3s ease-in-out;
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 0.3s ease-in-out;
+}
+
+/* Hover animations */
+.hover\:animate-scale-in:hover {
+  animation: scale-in 0.2s ease-in-out;
+}
+
+/* Transition utilities */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-150 {
+  transition-duration: 150ms;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
+.duration-500 {
+  transition-duration: 500ms;
 }
