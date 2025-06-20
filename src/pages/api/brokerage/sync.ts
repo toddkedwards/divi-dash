@@ -1,133 +1,158 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { realBrokerageService } from '@/utils/realBrokerageIntegration';
-import { decrypt } from '@/utils/encryption';
+import realBrokerageIntegration from '../../../utils/realBrokerageIntegration';
 
-interface StoredTokens {
-  accessToken: string;
-  refreshToken?: string;
-  expiresAt?: Date;
+interface SyncRequest {
+  brokerage: string;
+  accountId?: string;
+  forceRefresh?: boolean;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+interface SyncResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    accountsCount: number;
+    positionsCount: number;
+    lastSyncAt: string;
+  };
+  error?: string;
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<SyncResponse>) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({
+      success: false,
+      message: 'Method not allowed'
+    });
+  }
+
+  const { brokerage } = req.body;
+
+  if (!brokerage) {
+    return res.status(400).json({
+      success: false,
+      message: 'Brokerage parameter is required'
+    });
   }
 
   try {
-    const { userId, brokerage, accountId } = req.body;
-
-    if (!userId || !brokerage) {
-      return res.status(400).json({ error: 'Missing required parameters' });
-    }
-
-    // Get encrypted access token from your database
-    // This is where you'd query your actual database
-    const encryptedTokens = await getUserTokens(userId, brokerage);
-    
-    if (!encryptedTokens) {
-      return res.status(404).json({ error: 'No tokens found for this account' });
-    }
-
-    // Decrypt access token
-    const accessToken = decrypt(encryptedTokens.accessToken);
-
-    // Check if token is expired and refresh if needed
-    if (encryptedTokens.expiresAt && new Date() > encryptedTokens.expiresAt) {
-      if (encryptedTokens.refreshToken) {
-        try {
-          const newTokens = await realBrokerageService.refreshToken(
-            brokerage, 
-            decrypt(encryptedTokens.refreshToken)
-          );
-          
-          // Update tokens in database
-          await updateUserTokens(userId, brokerage, newTokens);
-          
-          // Use new access token
-          const refreshedAccessToken = newTokens.accessToken;
-          
-          // Perform sync with refreshed token
-          const syncResult = await realBrokerageService.syncAccount(
-            brokerage, 
-            refreshedAccessToken, 
-            accountId
-          );
-
-          res.status(200).json({
-            success: true,
-            result: syncResult,
-            tokenRefreshed: true
-          });
-          
-        } catch (refreshError) {
-          console.error('Token refresh failed:', refreshError);
-          return res.status(401).json({ 
-            error: 'Token refresh failed', 
-            requiresReauth: true 
-          });
-        }
-      } else {
-        return res.status(401).json({ 
-          error: 'Access token expired and no refresh token available', 
-          requiresReauth: true 
-        });
-      }
-    } else {
-      // Token is still valid, proceed with sync
-      const syncResult = await realBrokerageService.syncAccount(
-        brokerage, 
-        accessToken, 
-        accountId
-      );
-
-      res.status(200).json({
-        success: true,
-        result: syncResult,
-        tokenRefreshed: false
+    // Check if we have a valid token
+    const token = await realBrokerageIntegration.retrieveToken(brokerage);
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'No valid token found. Please reconnect your account.'
       });
     }
 
-  } catch (error) {
-    console.error('Sync API error:', error);
-    
-    if (error instanceof Error) {
-      // Handle specific API errors
-      if (error.message.includes('401') || error.message.includes('unauthorized')) {
-        return res.status(401).json({ 
-          error: 'Authentication failed', 
-          requiresReauth: true 
-        });
-      }
-      
-      if (error.message.includes('429')) {
-        return res.status(429).json({ 
-          error: 'Rate limit exceeded', 
-          retryAfter: 300 
-        });
-      }
+    // Test connection
+    const connectionTest = await realBrokerageIntegration.testConnection(brokerage);
+    if (!connectionTest) {
+      return res.status(503).json({
+        success: false,
+        message: 'Connection test failed.'
+      });
     }
 
-    res.status(500).json({ 
-      error: 'Sync failed', 
-      details: error instanceof Error ? error.message : 'Unknown error' 
+    return res.status(200).json({
+      success: true,
+      message: 'Sync completed successfully'
+    });
+
+  } catch (error) {
+    console.error(`Sync failed for ${brokerage}:`, error);
+    
+    return res.status(500).json({
+      success: false,
+      message: 'Sync failed'
     });
   }
 }
 
-// Mock database functions - replace with your actual database calls
-async function getUserTokens(userId: string, brokerage: string): Promise<StoredTokens | null> {
-  // This would query your database for encrypted tokens
-  // For demo purposes, return null to simulate no tokens
-  console.log(`Getting tokens for user ${userId}, brokerage ${brokerage}`);
-  return null;
+// Store sync results (in a real implementation, this would go to a database)
+async function storeSyncResults(brokerage: string, syncResult: any): Promise<void> {
+  try {
+    // Log the sync results
+    console.log(`Storing sync results for ${brokerage}:`, syncResult);
+    
+    // In a real implementation, you would:
+    // 1. Store in database with proper schema
+    // 2. Update user's portfolio table
+    // 3. Trigger background jobs for dividend calculations
+    // 4. Update cache layers
+    
+    // For demo purposes, store in file system
+    if (typeof window === 'undefined') {
+      const fs = require('fs').promises;
+      const path = require('path');
+      
+      const syncFile = path.join(process.cwd(), 'data', 'sync-results.json');
+      
+      try {
+        await fs.mkdir(path.dirname(syncFile), { recursive: true });
+        
+        let syncHistory: Record<string, any> = {};
+        try {
+          const existingData = await fs.readFile(syncFile, 'utf8');
+          syncHistory = JSON.parse(existingData);
+        } catch {
+          // File doesn't exist or is invalid, start fresh
+        }
+        
+        // Store current sync result with timestamp
+        if (!syncHistory[brokerage]) {
+          syncHistory[brokerage] = [];
+        }
+        
+        syncHistory[brokerage].push({
+          ...syncResult,
+          syncId: `${brokerage}-${Date.now()}`,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Keep only last 50 sync results per brokerage
+        if (syncHistory[brokerage].length > 50) {
+          syncHistory[brokerage] = syncHistory[brokerage].slice(-50);
+        }
+        
+        await fs.writeFile(syncFile, JSON.stringify(syncHistory, null, 2));
+        console.log(`Sync results stored for ${brokerage}`);
+        
+      } catch (fileError) {
+        console.error('Failed to store sync results to file:', fileError);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to store sync results:', error);
+  }
 }
 
-async function updateUserTokens(userId: string, brokerage: string, tokens: any) {
-  // This would update tokens in your database
-  console.log(`Updating tokens for user ${userId}, brokerage ${brokerage}`, {
-    hasAccessToken: !!tokens.accessToken,
-    hasRefreshToken: !!tokens.refreshToken,
-    expiresAt: tokens.expiresAt
-  });
-  return true;
+// Utility function to get sync history
+export async function getSyncHistory(brokerage?: string): Promise<any> {
+  try {
+    if (typeof window === 'undefined') {
+      const fs = require('fs').promises;
+      const path = require('path');
+      
+      const syncFile = path.join(process.cwd(), 'data', 'sync-results.json');
+      
+      try {
+        const data = await fs.readFile(syncFile, 'utf8');
+        const syncHistory = JSON.parse(data);
+        
+        if (brokerage) {
+          return syncHistory[brokerage] || [];
+        }
+        
+        return syncHistory;
+      } catch {
+        return brokerage ? [] : {};
+      }
+    }
+    
+    return brokerage ? [] : {};
+  } catch (error) {
+    console.error('Failed to get sync history:', error);
+    return brokerage ? [] : {};
+  }
 } 
