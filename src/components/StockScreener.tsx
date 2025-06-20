@@ -490,10 +490,10 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                               {stock.symbol}
                             </span>
                             {stock.isDividendAristocrat && (
-                              <Award className="h-4 w-4 text-yellow-500" title="Dividend Aristocrat" />
+                              <Award className="h-4 w-4 text-yellow-500" />
                             )}
                             {stock.isDividendKing && (
-                              <Award className="h-4 w-4 text-purple-500" title="Dividend King" />
+                              <Award className="h-4 w-4 text-purple-500" />
                             )}
                           </div>
                           <div className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[200px]">
@@ -510,7 +510,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             {formatCurrency(stock.price)}
                           </div>
                           <div className="text-sm text-gray-600 dark:text-gray-300">
-                            {formatCurrency(stock.marketCap / 1000000000, 1)}B
+                            ${(stock.marketCap / 1000000000).toFixed(1)}B
                           </div>
                         </div>
                       </td>
