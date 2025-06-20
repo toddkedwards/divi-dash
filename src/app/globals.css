@@ -50,160 +50,148 @@
     --ring: 142.4 71.8% 29.2%;
   }
 
+
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
   h1 {
-    @apply text-3xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-gray-100;
+    @apply text-3xl font-extrabold tracking-tight leading-tight;
   }
   h2 {
-    @apply text-2xl font-bold tracking-tight leading-snug text-gray-900 dark:text-gray-100;
+    @apply text-2xl font-bold tracking-tight leading-snug;
   }
   h3 {
-    @apply text-xl font-semibold text-gray-900 dark:text-gray-100;
+    @apply text-xl font-semibold;
   }
-  body {
-    @apply bg-white text-black;
-  }
-  table th {
-    @apply text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide;
-  }
-  table td {
-    @apply text-sm text-gray-900 dark:text-gray-100;
-  }
-  .meta-text {
-    @apply text-xs text-gray-500 dark:text-gray-400 font-medium;
-  }
-}
 
-@layer base {
-  * {
-    @apply border-gray-200;
+  input, select, textarea {
+    @apply bg-background border-input text-foreground placeholder-muted-foreground;
   }
-  body {
-    @apply bg-white text-black;
+
+  button {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none;
   }
 }
 
 /* Theme transition */
-.theme-transition {
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+.theme-transition * {
+  @apply transition-colors duration-200;
+}
+
+/* Animation utilities */
+.animate-in {
+  animation: animate-in 0.2s ease-in-out;
+}
+
+.animate-out {
+  animation: animate-out 0.2s ease-in-out;
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes animate-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+}
+
+/* Interactive states */
+.interactive {
+  @apply hover:bg-muted/50 active:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none;
+}
+
+/* Card styles */
+.card {
+  @apply bg-card text-card-foreground rounded-lg border shadow-sm;
+}
+
+.card-header {
+  @apply p-6 border-b;
+}
+
+.card-content {
+  @apply p-6;
+}
+
+.card-footer {
+  @apply p-6 border-t;
+}
+
+/* Form styles */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply text-sm font-medium text-foreground;
+}
+
+.form-input {
+  @apply w-full px-3 py-2 rounded-md border bg-background text-foreground focus:ring-2 focus:ring-ring focus:border-input;
+}
+
+.form-helper {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Button variants */
+.btn-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+}
+
+.btn-outline {
+  @apply border-2 border-input bg-background hover:bg-accent hover:text-accent-foreground;
+}
+
+.btn-ghost {
+  @apply hover:bg-accent hover:text-accent-foreground;
+}
+
+/* Badge variants */
+.badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+}
+
+.badge-primary {
+  @apply bg-primary/10 text-primary hover:bg-primary/20;
+}
+
+.badge-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+}
+
+.badge-destructive {
+  @apply bg-destructive/10 text-destructive hover:bg-destructive/20;
 }
 
 /* Dark mode specific styles */
 .dark {
   color-scheme: dark;
-}
-
-.dark .bg-white {
-  @apply bg-gray-900;
-}
-
-.dark .text-gray-900 {
-  @apply text-gray-100;
-}
-
-.dark .text-gray-700 {
-  @apply text-gray-300;
-}
-
-.dark .text-gray-500 {
-  @apply text-gray-400;
-}
-
-.dark .border-gray-200 {
-  @apply border-gray-700;
-}
-
-.dark .hover\:bg-gray-50:hover {
-  @apply hover:bg-gray-800/50;
-}
-
-.dark .bg-gray-100 {
-  @apply bg-gray-800;
-}
-
-.dark .bg-gray-50 {
-  @apply bg-gray-800/50;
-}
-
-.dark .shadow-md {
-  @apply shadow-lg shadow-black/20;
-}
-
-.dark .ring-gray-200 {
-  @apply ring-gray-700;
-}
-
-.dark .focus\:ring-gray-200:focus {
-  @apply focus:ring-gray-700;
-}
-
-.dark .divide-gray-200 {
-  @apply divide-gray-700;
-}
-
-.dark .placeholder-gray-400::placeholder {
-  @apply placeholder-gray-500;
-}
-
-/* Dark mode button styles */
-.dark .btn-primary {
-  @apply bg-green-600 hover:bg-green-700 text-white;
-}
-
-.dark .btn-secondary {
-  @apply bg-gray-700 hover:bg-gray-600 text-gray-100;
-}
-
-.dark .btn-outline {
-  @apply border-gray-600 text-gray-100 hover:bg-gray-700;
-}
-
-/* Dark mode input styles */
-.dark input,
-.dark select,
-.dark textarea {
-  @apply bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500;
-}
-
-.dark input:focus,
-.dark select:focus,
-.dark textarea:focus {
-  @apply border-green-500 ring-green-500;
-}
-
-/* Dark mode table styles */
-.dark table {
-  @apply border-gray-700;
-}
-
-.dark th {
-  @apply bg-gray-800 text-gray-300;
-}
-
-.dark td {
-  @apply border-gray-700;
-}
-
-.dark tr:hover {
-  @apply bg-gray-800/50;
-}
-
-/* Dark mode card styles */
-.dark .card {
-  @apply bg-gray-900 border-gray-700;
-}
-
-/* Dark mode badge styles */
-.dark .badge-success {
-  @apply bg-green-900/30 text-green-400;
-}
-
-.dark .badge-error {
-  @apply bg-red-900/30 text-red-400;
-}
-
-/* Dark mode tooltip styles */
-.dark .tooltip {
-  @apply bg-gray-800 text-gray-100 border-gray-700;
 }
 
 /* Animation styles */
@@ -250,99 +238,26 @@
   }
 }
 
-@keyframes scale-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-@keyframes slide-in-left {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slide-out-left {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes slide-out-right {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-
 .animate-fade-in {
-  animation: fade-in 0.3s ease-in-out;
+  animation: fade-in 0.2s ease-out;
 }
 
 .animate-fade-out {
-  animation: fade-out 0.3s ease-in-out;
+  animation: fade-out 0.2s ease-in;
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.3s ease-in-out;
+  animation: fade-in-up 0.3s ease-out;
 }
 
 .animate-fade-in-down {
-  animation: fade-in-down 0.3s ease-in-out;
+  animation: fade-in-down 0.3s ease-out;
 }
 
 .animate-scale-in {
-  animation: scale-in 0.2s ease-in-out;
+  animation: scale-in 0.2s ease-out;
 }
 
-.animate-scale-out {
-  animation: scale-out 0.2s ease-in-out;
-}
-
-.animate-slide-in-left {
-  animation: slide-in-left 0.3s ease-in-out;
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-in-out;
-}
-
-.animate-slide-out-left {
-  animation: slide-out-left 0.3s ease-in-out;
-}
-
-.animate-slide-out-right {
-  animation: slide-out-right 0.3s ease-in-out;
-}
-
-/* Hover animations */
-.hover\:animate-scale-in:hover {
-  animation: scale-in 0.2s ease-in-out;
-}
-
-/* Transition utilities */
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
