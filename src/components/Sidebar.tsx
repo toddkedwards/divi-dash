@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { useAuth } from '../context/AuthContext';
 import AuthButton from './AuthButton';
-import { User, LogOut, LogIn, Settings, Sun, Moon, LayoutDashboard, Briefcase, Calendar, Target, Search, BarChart, Gem, DollarSign, X, Newspaper } from 'lucide-react';
+import { User, LogOut, LogIn, Settings, Sun, Moon, LayoutDashboard, Briefcase, Calendar, Target, Search, BarChart, Gem, DollarSign, X, Newspaper, Filter } from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ const navigationItems = [
   { name: 'Portfolio', href: '/positions', icon: <Briefcase size={20} /> },
   { name: 'Dividend Calendar', href: '/dividend-calendar', icon: <Calendar size={20} /> },
   { name: 'Dividend Calculator', href: '/dividend-calculator', icon: <DollarSign size={20} /> },
+  { name: 'Stock Screener', href: '/stock-screener', icon: <Filter size={20} /> },
   { name: 'News & Sentiment', href: '/news-dashboard', icon: <Newspaper size={20} /> },
   { name: 'Portfolio Goals', href: '/portfolio-goals', icon: <Target size={20} /> },
   { name: 'Stock Ticker Finder', href: '/stock-ticker-finder', icon: <Search size={20} /> },
