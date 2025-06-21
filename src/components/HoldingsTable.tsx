@@ -37,10 +37,11 @@ interface HoldingsTableProps {
 }
 
 const DEFAULT_COLUMNS = [
-  'Ticker', 'Company', 'Sector', 'Shares', 'Avg. Price', 'Current Price', 'Daily Change', 'Cost Basis', 'Market Value', 'Gain/Loss', 'Dividend Yield', 'Actions'
+  'Logo', 'Ticker', 'Company', 'Sector', 'Shares', 'Avg. Price', 'Current Price', 'Daily Change', 'Cost Basis', 'Market Value', 'Gain/Loss', 'Dividend Yield', 'Actions'
 ];
 
 const COLUMN_KEYS = [
+  { key: 'Logo', label: 'Logo' },
   { key: 'Ticker', label: 'Ticker' },
   { key: 'Company', label: 'Company' },
   { key: 'Sector', label: 'Sector' },
@@ -55,7 +56,7 @@ const COLUMN_KEYS = [
   { key: 'Actions', label: 'Actions' }
 ];
 
-const ESSENTIAL_COLUMNS = ['Ticker', 'Company', 'Shares', 'Current Price', 'Gain/Loss'];
+const ESSENTIAL_COLUMNS = ['Logo', 'Ticker', 'Company', 'Shares', 'Current Price', 'Gain/Loss'];
 
 interface FilterState {
   sectors: string[];
@@ -438,21 +439,31 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
 
   const renderCell = (holding: Holding, column: string) => {
     switch (column) {
-      case 'Ticker':
+      case 'Logo':
+        const logoUrl = profileCache[holding.symbol]?.logo || companyInfo[holding.symbol]?.logo;
         return (
-          <div className="flex items-center gap-2">
-            {profileCache[holding.symbol]?.logo && (
+          <div className="flex items-center justify-center">
+            {logoUrl ? (
               <Image
-                src={profileCache[holding.symbol].logo}
+                src={logoUrl}
                 alt={holding.symbol}
-                width={20}
-                height={20}
-                className="rounded"
+                width={32}
+                height={32}
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white"
+                onError={(e) => {
+                  // Hide image if it fails to load
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
               />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </div>
             )}
-            <span className="font-mono">{holding.symbol}</span>
           </div>
         );
+      case 'Ticker':
+        return <span className="font-mono">{holding.symbol}</span>;
       case 'Company':
         return profileCache[holding.symbol]?.name || companyInfo[holding.symbol]?.name || holding.symbol;
       case 'Sector':
@@ -607,7 +618,7 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
               title="Add a new position"
               style={{ minWidth: 160 }}
             >
-              + Add to Watchlist
+              + Add to Portfolio
             </Button>
             <Button
               variant="primary"
