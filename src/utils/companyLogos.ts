@@ -7,17 +7,17 @@ export interface CompanyInfo {
 export const companyInfo: Record<string, CompanyInfo> = {
   AAPL: {
     name: "Apple Inc.",
-    logo: "🍎",
+    logo: "https://logo.clearbit.com/apple.com",
     color: "#000000"
   },
   MSFT: {
     name: "Microsoft Corporation",
-    logo: "🪟",
+    logo: "https://logo.clearbit.com/microsoft.com",
     color: "#00A4EF"
   },
   T: {
     name: "AT&T Inc.",
-    logo: "📱",
+    logo: "https://logo.clearbit.com/att.com",
     color: "#00A8E0"
   }
 }; 

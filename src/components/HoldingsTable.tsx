@@ -104,7 +104,16 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
   const [selectedColumns, setSelectedColumns] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('selectedColumns');
-      return saved ? JSON.parse(saved) : DEFAULT_COLUMNS;
+      if (saved) {
+        const parsedColumns = JSON.parse(saved);
+        // If Logo column is missing from saved columns, reset to default
+        if (!parsedColumns.includes('Logo')) {
+          localStorage.setItem('selectedColumns', JSON.stringify(DEFAULT_COLUMNS));
+          return DEFAULT_COLUMNS;
+        }
+        return parsedColumns;
+      }
+      return DEFAULT_COLUMNS;
     }
     return DEFAULT_COLUMNS;
   });
@@ -441,9 +450,10 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
     switch (column) {
       case 'Logo':
         const logoUrl = profileCache[holding.symbol]?.logo || companyInfo[holding.symbol]?.logo;
+        const isValidUrl = logoUrl && (logoUrl.startsWith('http://') || logoUrl.startsWith('https://'));
         return (
           <div className="flex items-center justify-center">
-            {logoUrl ? (
+            {isValidUrl ? (
               <Image
                 src={logoUrl}
                 alt={holding.symbol}
@@ -451,15 +461,20 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
                 height={32}
                 className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white"
                 onError={(e) => {
-                  // Hide image if it fails to load
-                  (e.target as HTMLImageElement).style.display = 'none';
+                  // Replace with fallback icon if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
                 }}
               />
-            ) : (
-              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              </div>
-            )}
+            ) : null}
+            <div 
+              className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700"
+              style={{ display: isValidUrl ? 'none' : 'flex' }}
+            >
+              <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            </div>
           </div>
         );
       case 'Ticker':
@@ -726,7 +741,7 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
               </tr>
             </thead>
             <tbody>
-              {filteredHoldings.map((holding, idx) => (
+              {sortedHoldings.map((holding, idx) => (
                 <tr
                   key={holding.symbol}
                   className={`transition-colors ${idx % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-green-50 dark:hover:bg-green-900 border-b border-gray-200 dark:border-gray-700`}
