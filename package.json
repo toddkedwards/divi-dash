@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:packages && next build",
+    "build:packages": "npm run build --workspace=packages/data-models && npm run build --workspace=packages/core",
     "start": "next start",
     "lint": "next lint",
     "deploy": "vercel --prod"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "@geist-ui/icons": "^1.0.2",
     "@geist-ui/react": "^2.2.5",
@@ -28,7 +32,9 @@
     "react-dom": "^18.2.0",
     "recharts": "^2.15.3",
     "stripe": "^18.2.1",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "@divly/core": "file:../packages/core",
+    "@divly/data-models": "file:../packages/data-models"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.3.3",
