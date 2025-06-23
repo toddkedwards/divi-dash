@@ -1,7 +1,8 @@
 "use client";
 import React from 'react';
+import Link from 'next/link';
 import { useUserSettings } from '@/context/UserSettingsContext';
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, AlertCircle, Zap, BarChart3, Bell } from 'lucide-react';
 
 export default function SettingsPage() {
   const { settings, updateSetting, loading, syncing, syncError } = useUserSettings();
@@ -32,7 +33,35 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+      
       <div className="space-y-8">
+        {/* Advanced Features */}
+        <section className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Zap className="text-blue-600" size={24} />
+            Advanced Features
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            Access powerful analytics, automation, and advanced portfolio management tools.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link href="/advanced-features" className="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600">
+              <BarChart3 className="text-blue-600" size={20} />
+              <div>
+                <h3 className="font-medium">Advanced Analytics</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Real-time alerts & portfolio insights</p>
+              </div>
+            </Link>
+            <Link href="/integration-automation" className="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600">
+              <Zap className="text-purple-600" size={20} />
+              <div>
+                <h3 className="font-medium">Integration & Automation</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Brokerage sync & automated workflows</p>
+              </div>
+            </Link>
+          </div>
+        </section>
+
         {/* Notification Preferences */}
         <section>
           <h2 className="text-xl font-semibold mb-2">Notifications</h2>

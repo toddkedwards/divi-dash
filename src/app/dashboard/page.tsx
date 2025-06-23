@@ -4,6 +4,9 @@ import DividendCard from '../../components/DividendCard';
 import { useDividends } from '../../context/DividendsContext';
 import Card from '../../components/Card';
 import PortfolioSelector from '@/components/PortfolioSelector';
+import MonthlyIncomeChart from '../../components/MonthlyIncomeChart';
+import PortfolioCompositionChart from '../../components/PortfolioCompositionChart';
+import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 
 export default function DashboardPage() {
   const { holdings } = usePortfolio();
@@ -25,65 +28,119 @@ export default function DashboardPage() {
   const quarterlyIncome = projectedAnnualIncome / 4;
 
   return (
-    <main>
+    <main className="space-y-8">
       <PortfolioSelector />
-      <h1 className="mb-8">Portfolio</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 mb-10 md:mb-16">
-        <Card>
-          <DividendCard 
-            title="Total Portfolio Value" 
-            value={`$${totalPortfolioValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}`} 
-            meta={<span className="text-green-600 dark:text-green-400 text-sm">+$14.69 (+0.03%) Today</span>} 
-          />
-        </Card>
-        <Card>
-          <DividendCard 
-            title="Projected Annual Income" 
-            value={`$${projectedAnnualIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}`} 
-            meta={<span className="text-green-600 dark:text-green-400 text-sm">+{avgYield.toFixed(2)}% Current Yield</span>} 
-          />
-        </Card>
-        <Card>
-          <DividendCard title="Total Cost Basis" value={`$${totalCostBasis.toLocaleString(undefined, { maximumFractionDigits: 2 })}`} />
-        </Card>
-        <Card>
-          <DividendCard title="Projected Daily Income" value={`$${projectedDailyIncome.toLocaleString(undefined, { maximumFractionDigits: 4 })}`} />
-        </Card>
-        <Card>
-          <DividendCard title="Projected Hourly Income" value={`$${projectedHourlyIncome.toLocaleString(undefined, { maximumFractionDigits: 6 })}`} />
-        </Card>
-        <Card>
-          <DividendCard 
-            title="Total Gain / Loss" 
-            value={`$${totalGainLoss.toLocaleString(undefined, { maximumFractionDigits: 2 })}`} 
-            meta={<span className={`${totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'} text-sm`}>{gainLossPercent >= 0 ? '+' : ''}{gainLossPercent.toFixed(2)}% Overall</span>} 
-          />
-        </Card>
-        <Card>
-          <DividendCard title="Yield on Cost" value={`${yieldOnCost.toFixed(2)}%`} />
-        </Card>
+      
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Portfolio Overview</h1>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          Last updated: {new Date().toLocaleDateString()}
+        </div>
       </div>
-      <div className="h-1 w-full bg-gray-100 dark:bg-gray-800 rounded mb-8 md:mb-12" />
-      <Card className="mb-8 md:mb-12">
-        <h2 className="mb-4">Dividend Income Projections</h2>
-        <div className="text-base text-gray-600 dark:text-gray-300 mb-4">
-          Estimated income based on current holdings and dividend rates.
-        </div>
-        <div className="flex gap-10 text-lg font-semibold">
-          <div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Monthly</div>
-            ${monthlyIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-          </div>
-          <div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Quarterly</div>
-            ${quarterlyIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-          </div>
-          <div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Annually</div>
-            ${projectedAnnualIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-          </div>
-        </div>
-      </Card>
+
+      {/* Main Metrics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <DividendCard 
+          title="Market Value" 
+          value={`$${totalPortfolioValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+          trend="up"
+          meta={
+            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+              <TrendingUp size={16} />
+              <span className="text-sm font-medium">+$14.69 (+0.03%)</span>
+            </div>
+          } 
+        />
+        
+        <DividendCard 
+          title="Cost Basis" 
+          value={`$${totalCostBasis.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+          trend="neutral"
+          subtitle="Total invested"
+        />
+        
+        <DividendCard 
+          title="Total Gain/Loss" 
+          value={`$${totalGainLoss.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+          trend={totalGainLoss >= 0 ? "up" : "down"}
+          meta={
+            <div className={`flex items-center gap-1 ${totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {totalGainLoss >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+              <span className="text-sm font-medium">
+                {gainLossPercent >= 0 ? '+' : ''}{gainLossPercent.toFixed(2)}%
+              </span>
+            </div>
+          } 
+        />
+        
+        <DividendCard 
+          title="Cash Available" 
+          value="$257.44"
+          trend="neutral"
+          subtitle="Ready to invest"
+        />
+      </div>
+
+      {/* Dividend Income Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <DividendCard 
+          title="Annual Dividend Income" 
+          value={`$${projectedAnnualIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+          trend="up"
+          subtitle={`${avgYield.toFixed(2)}% average yield`}
+          meta={
+            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+              <DollarSign size={16} />
+              <span className="text-sm font-medium">Projected</span>
+            </div>
+          }
+        />
+        
+        <DividendCard 
+          title="Monthly Income" 
+          value={`$${monthlyIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+          trend="up"
+          subtitle="Average per month"
+        />
+        
+        <DividendCard 
+          title="Yield on Cost" 
+          value={`${yieldOnCost.toFixed(2)}%`}
+          trend="up"
+          subtitle="Return on investment"
+        />
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <MonthlyIncomeChart holdings={holdings} />
+        <PortfolioCompositionChart holdings={holdings} />
+      </div>
+
+      {/* Additional Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <DividendCard 
+          title="Daily Income" 
+          value={`$${projectedDailyIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+          trend="up"
+          subtitle="Projected daily"
+        />
+        
+        <DividendCard 
+          title="Quarterly Income" 
+          value={`$${quarterlyIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+          trend="up"
+          subtitle="Every 3 months"
+        />
+        
+        <DividendCard 
+          title="Holdings Count" 
+          value={holdings.length.toString()}
+          trend="neutral"
+          subtitle="Total positions"
+        />
+      </div>
     </main>
   );
 }

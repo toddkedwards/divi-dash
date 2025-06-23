@@ -6,12 +6,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { useAuth } from '../context/AuthContext';
 import AuthButton from './AuthButton';
-import { User, LogOut, LogIn, Settings, Sun, Moon, LayoutDashboard, Briefcase, Calendar, Target, Search, BarChart, Gem, DollarSign, X, Newspaper, Filter, Zap } from 'lucide-react';
+import { 
+  User, 
+  LogOut, 
+  LogIn, 
+  Settings, 
+  Sun, 
+  Moon, 
+  LayoutDashboard, 
+  Briefcase, 
+  Calendar, 
+  Target, 
+  Search, 
+  BarChart, 
+  Gem, 
+  DollarSign, 
+  X, 
+  Newspaper, 
+  Filter, 
+  Zap, 
+  Brain, 
+  Users 
+} from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import Image from 'next/image';
 
-// Organized navigation with logical groupings
+// Simplified navigation with logical groupings
 const navigationItems = [
   // Core Portfolio Management
   { name: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={20} />, group: 'core' },
@@ -19,17 +40,17 @@ const navigationItems = [
   { name: 'Portfolio Insights', href: '/portfolio-insights', icon: <BarChart size={20} />, group: 'core' },
   { name: 'Portfolio Goals', href: '/portfolio-goals', icon: <Target size={20} />, group: 'core' },
   
-  // Dividend Tools
-  { name: 'Dividend Calendar', href: '/dividend-calendar', icon: <Calendar size={20} />, group: 'dividends' },
-  { name: 'Dividend Calculator', href: '/dividend-calculator', icon: <DollarSign size={20} />, group: 'dividends' },
+  // Investment Tools (Combined dividend + research tools)
+  { name: 'Dividend Calendar', href: '/dividend-calendar', icon: <Calendar size={20} />, group: 'tools' },
+  { name: 'Dividend Calculator', href: '/dividend-calculator', icon: <DollarSign size={20} />, group: 'tools' },
+  { name: 'Stock Screener', href: '/stock-screener', icon: <Filter size={20} />, group: 'tools' },
+  { name: 'Stock Finder', href: '/stock-ticker-finder', icon: <Search size={20} />, group: 'tools' },
+  { name: 'News & Sentiment', href: '/news-dashboard', icon: <Newspaper size={20} />, group: 'tools' },
   
-  // Research & Discovery
-  { name: 'Stock Screener', href: '/stock-screener', icon: <Filter size={20} />, group: 'research' },
-  { name: 'Stock Ticker Finder', href: '/stock-ticker-finder', icon: <Search size={20} />, group: 'research' },
-  { name: 'News & Sentiment', href: '/news-dashboard', icon: <Newspaper size={20} />, group: 'research' },
-  
-  // Advanced Features
-  { name: 'Integration & Automation', href: '/integration-automation', icon: <Zap size={20} />, group: 'advanced' },
+  // AI & Community
+  { name: 'Advanced Features', href: '/advanced-features', icon: <Zap size={20} />, group: 'smart' },
+  { name: 'AI Recommendations', href: '/ai-recommendations', icon: <Brain size={20} />, group: 'smart' },
+  { name: 'Community Hub', href: '/community', icon: <Users size={20} />, group: 'smart' },
 ];
 
 export default function Sidebar() {
@@ -46,9 +67,8 @@ export default function Sidebar() {
   const renderNavItems = () => {
     // Group items by category
     const coreItems = navigationItems.filter(item => item.group === 'core');
-    const dividendItems = navigationItems.filter(item => item.group === 'dividends');
-    const researchItems = navigationItems.filter(item => item.group === 'research');
-    const advancedItems = navigationItems.filter(item => item.group === 'advanced');
+    const toolsItems = navigationItems.filter(item => item.group === 'tools');
+    const smartItems = navigationItems.filter(item => item.group === 'smart');
 
     const renderGroup = (items: typeof navigationItems, title?: string) => (
       <div className="space-y-1">
@@ -65,10 +85,10 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 text-lg font-medium
-                hover:bg-primary-dark hover:text-soft-white
-                dark:hover:bg-primary dark:hover:text-soft-white
-                ${isActive ? 'bg-white text-green-700 shadow font-bold' : 'text-white dark:text-green-100'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 font-medium
+                hover:bg-green-800 hover:text-white
+                dark:hover:bg-green-600 dark:hover:text-white
+                ${isActive ? 'bg-white text-green-700 shadow font-bold' : 'text-white'}`}
             >
               {item.icon}
               {item.name}
@@ -83,14 +103,11 @@ export default function Sidebar() {
         {/* Core Portfolio Management */}
         {renderGroup(coreItems)}
         
-        {/* Dividend Tools */}
-        {renderGroup(dividendItems, 'Dividend Tools')}
+        {/* Investment Tools */}
+        {renderGroup(toolsItems, 'Investment Tools')}
         
-        {/* Research & Discovery */}
-        {renderGroup(researchItems, 'Research')}
-        
-        {/* Advanced Features */}
-        {renderGroup(advancedItems, 'Advanced')}
+        {/* Smart Features */}
+        {renderGroup(smartItems, 'Smart Features')}
       </nav>
     );
   };
@@ -196,7 +213,7 @@ export default function Sidebar() {
       </button>
 
       {/* Sidebar always visible on desktop/tablet */}
-      <aside className="flex flex-col w-64 h-screen" style={{ backgroundColor: '#18b64a' }}>
+      <aside className="flex flex-col w-64 h-screen bg-gradient-to-b from-green-600 to-green-700 dark:from-green-700 dark:to-green-800">
         <div className="p-6 flex flex-col h-full">
           <div className="flex items-center gap-3 mb-10 pl-4">
             <Image
@@ -206,7 +223,7 @@ export default function Sidebar() {
               height={40}
               className="flex-shrink-0 -mt-1"
             />
-            <h1 className="text-3xl font-extrabold tracking-tight text-white dark:text-green-100">Divly</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">Divly</h1>
           </div>
           {renderNavItems()}
           {renderUserSection()}
@@ -223,7 +240,7 @@ export default function Sidebar() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed inset-0 z-50 flex"
           >
-            <div className="w-64 h-full text-soft-white shadow-lg flex flex-col p-6" style={{ backgroundColor: '#18b64a' }}>
+            <div className="w-64 h-full text-soft-white shadow-lg flex flex-col p-6 bg-gradient-to-b from-green-600 to-green-700 dark:from-green-700 dark:to-green-800">
               <div className="flex items-center gap-3 mb-10 pl-4">
                 <Image
                   src="/divly-logo.svg"
@@ -232,7 +249,7 @@ export default function Sidebar() {
                   height={40}
                   className="flex-shrink-0 -mt-1"
                 />
-                <h1 className="text-3xl font-extrabold tracking-tight text-white dark:text-green-100">Divly</h1>
+                <h1 className="text-3xl font-extrabold tracking-tight text-white">Divly</h1>
               </div>
               {renderNavItems()}
               {renderUserSection()}

@@ -15,6 +15,7 @@ export interface ScreenerCriteria {
   minPayoutRatio?: number;
   maxPayoutRatio?: number;
   minYearsOfGrowth?: number;
+  minConsecutiveGrowth?: number;
   
   // Financial Filters
   minPE?: number;
@@ -23,21 +24,69 @@ export interface ScreenerCriteria {
   maxROE?: number;
   minDebtToEquity?: number;
   maxDebtToEquity?: number;
+  minCurrentRatio?: number;
+  maxCurrentRatio?: number;
+  minQuickRatio?: number;
+  minProfitMargin?: number;
+  minOperatingMargin?: number;
+  
+  // Valuation Filters
+  maxPriceToBook?: number;
+  minPriceToBook?: number;
+  maxPriceToSales?: number;
+  minPriceToSales?: number;
   
   // Performance Filters
   min52WeekPerformance?: number;
   max52WeekPerformance?: number;
   minVolume?: number;
+  minRevenue?: number;
+  minRevenueGrowth?: number;
+  minEpsGrowth?: number;
+  
+  // Technical Filters
+  minBeta?: number;
+  maxBeta?: number;
+  minRSI?: number;
+  maxRSI?: number;
+  isAbove50DayMA?: boolean;
+  isAbove200DayMA?: boolean;
+  
+  // Quality Filters
+  minCreditRating?: string; // 'AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC'
+  minDividendSafetyScore?: number;
+  minFinancialStrengthScore?: number;
+  
+  // ESG Filters
+  minESGScore?: number;
+  maxESGScore?: number;
+  includeESGLeaders?: boolean;
   
   // Sector/Industry
   sectors?: string[];
   industries?: string[];
+  excludeSectors?: string[];
+  
+  // Geographic Filters
+  regions?: string[];
+  countries?: string[];
+  exchanges?: string[];
   
   // Special Categories
   isDividendAristocrat?: boolean;
   isDividendKing?: boolean;
   isREIT?: boolean;
   isUtility?: boolean;
+  isDividendContender?: boolean; // 10-24 years of growth
+  isDividendChampion?: boolean; // 25+ years of growth
+  isESGLeader?: boolean;
+  
+  // Advanced Filters
+  hasEarningsGrowth?: boolean;
+  hasRevenueGrowth?: boolean;
+  hasPositiveFCF?: boolean; // Free Cash Flow
+  hasDividendCoverage?: boolean; // FCF covers dividends
+  isUndervalued?: boolean; // Based on multiple metrics
 }
 
 export interface ScreenerResult {
@@ -47,31 +96,113 @@ export interface ScreenerResult {
   industry: string;
   price: number;
   marketCap: number;
+  exchange: string;
+  country: string;
   
   // Dividend Data
   dividendYield: number;
   dividendGrowth: number;
+  dividendGrowth5Y: number;
+  dividendGrowth10Y: number;
   payoutRatio: number;
+  fcfPayoutRatio: number; // Free Cash Flow payout ratio
   yearsOfGrowth: number;
+  consecutiveGrowthYears: number;
   sustainabilityScore: number;
+  dividendSafetyScore: number;
   
   // Financial Metrics
   pe: number;
+  peg: number; // Price/Earnings to Growth
+  priceToBook: number;
+  priceToSales: number;
+  priceToFCF: number;
   roe: number;
+  roa: number; // Return on Assets
+  roic: number; // Return on Invested Capital
   debtToEquity: number;
+  currentRatio: number;
+  quickRatio: number;
+  interestCoverage: number;
+  
+  // Profitability
+  grossMargin: number;
+  operatingMargin: number;
+  profitMargin: number;
+  fcfMargin: number;
+  
+  // Growth Metrics
+  revenueGrowth: number;
+  revenueGrowth5Y: number;
+  epsGrowth: number;
+  epsGrowth5Y: number;
+  fcfGrowth: number;
   
   // Performance
   performance52Week: number;
+  performance1Month: number;
+  performance3Month: number;
+  performance6Month: number;
+  performance1Year: number;
+  performance3Year: number;
+  performance5Year: number;
   volume: number;
+  avgVolume: number;
   
-  // Ratings
+  // Technical Indicators
+  beta: number;
+  rsi: number;
+  ma50: number;
+  ma200: number;
+  priceVsMa50: number; // Price relative to 50-day MA
+  priceVsMa200: number; // Price relative to 200-day MA
+  
+  // Credit & Quality
+  creditRating: string;
+  financialStrengthScore: number;
+  profitabilityRank: number;
+  
+  // ESG
+  esgScore: number;
+  environmentScore: number;
+  socialScore: number;
+  governanceScore: number;
+  
+  // Valuation Metrics
+  intrinsicValue: number;
+  fairValue: number;
+  upside: number; // Potential upside based on fair value
+  
+  // Ratings & Scores
   overallScore: number;
+  dividendScore: number;
+  financialScore: number;
+  valuationScore: number;
+  qualityScore: number;
+  momentumScore: number;
+  
   recommendation: 'Strong Buy' | 'Buy' | 'Hold' | 'Sell' | 'Strong Sell';
+  analystRating: number; // 1-5 scale
+  priceTarget: number;
+  analystCount: number;
   
   // Special Categories
   isDividendAristocrat: boolean;
   isDividendKing: boolean;
+  isDividendContender: boolean;
+  isDividendChampion: boolean;
   isREIT: boolean;
+  isESGLeader: boolean;
+  
+  // Risk Metrics
+  volatility: number;
+  maxDrawdown: number;
+  sharpeRatio: number;
+  sortinRatio: number;
+  
+  // Last Updated
+  lastUpdated: string;
+  dataQuality: 'High' | 'Medium' | 'Low';
 }
 
 export interface PresetScreen {
@@ -79,90 +210,176 @@ export interface PresetScreen {
   name: string;
   description: string;
   criteria: ScreenerCriteria;
-  category: 'dividend' | 'growth' | 'value' | 'income' | 'aristocrats';
+  category: 'dividend' | 'growth' | 'value' | 'income' | 'aristocrats' | 'quality' | 'esg' | 'international';
+  tags: string[];
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  expectedResults: number;
 }
 
-// Preset screening strategies
+// Enhanced preset screening strategies
 export const PRESET_SCREENS: PresetScreen[] = [
-  {
-    id: 'high-yield-dividend',
-    name: 'High Yield Dividend Stocks',
-    description: 'Stocks with dividend yields above 4% and sustainable payouts',
-    category: 'dividend',
-    criteria: {
-      minYield: 4,
-      maxPayoutRatio: 80,
-      minYearsOfGrowth: 3,
-      minMarketCap: 1000000000 // $1B
-    }
-  },
   {
     id: 'dividend-aristocrats',
     name: 'Dividend Aristocrats',
     description: 'S&P 500 companies with 25+ years of consecutive dividend increases',
     category: 'aristocrats',
+    tags: ['quality', 'long-term', 'stable'],
+    difficulty: 'Beginner',
+    expectedResults: 65,
     criteria: {
       isDividendAristocrat: true,
       minYearsOfGrowth: 25,
-      minMarketCap: 5000000000 // $5B
+      minMarketCap: 5000000000, // $5B
+      minCurrentRatio: 1.0
     }
   },
   {
     id: 'dividend-kings',
     name: 'Dividend Kings',
-    description: 'Companies with 50+ years of consecutive dividend increases',
+    description: 'Elite companies with 50+ years of consecutive dividend increases',
     category: 'aristocrats',
+    tags: ['elite', 'ultra-stable', 'legacy'],
+    difficulty: 'Beginner',
+    expectedResults: 45,
     criteria: {
       isDividendKing: true,
-      minYearsOfGrowth: 50
+      minYearsOfGrowth: 50,
+      minMarketCap: 1000000000 // $1B
     }
   },
   {
-    id: 'growing-dividends',
-    name: 'Growing Dividend Stocks',
-    description: 'Companies with strong dividend growth and reasonable valuations',
-    category: 'growth',
+    id: 'high-yield-quality',
+    name: 'High Yield Quality Dividends',
+    description: 'High-yielding stocks with sustainable payouts and strong financials',
+    category: 'income',
+    tags: ['high-yield', 'sustainable', 'income'],
+    difficulty: 'Intermediate',
+    expectedResults: 75,
     criteria: {
-      minDividendGrowth: 5,
-      minYield: 2,
-      maxPE: 25,
-      minROE: 10,
-      minYearsOfGrowth: 5
+      minYield: 4,
+      maxPayoutRatio: 75,
+      minYearsOfGrowth: 5,
+      minMarketCap: 2000000000, // $2B
+      minCurrentRatio: 1.2,
+      minFinancialStrengthScore: 60
     }
   },
   {
-    id: 'value-dividends',
-    name: 'Value Dividend Stocks',
-    description: 'Undervalued stocks with attractive dividend yields',
+    id: 'dividend-growth-champions',
+    name: 'Dividend Growth Champions',
+    description: 'Companies with exceptional dividend growth and strong fundamentals',
+    category: 'growth',
+    tags: ['growth', 'fundamental', 'long-term'],
+    difficulty: 'Intermediate',
+    expectedResults: 50,
+    criteria: {
+      minDividendGrowth: 8,
+      minYield: 1.5,
+      maxPE: 25,
+      minROE: 12,
+      minYearsOfGrowth: 10,
+      hasRevenueGrowth: true,
+      hasEarningsGrowth: true
+    }
+  },
+  {
+    id: 'undervalued-dividends',
+    name: 'Undervalued Dividend Stocks',
+    description: 'Value dividend stocks trading below fair value with strong yields',
     category: 'value',
+    tags: ['value', 'undervalued', 'opportunity'],
+    difficulty: 'Advanced',
+    expectedResults: 40,
     criteria: {
       minYield: 3,
       maxPE: 15,
-      maxDebtToEquity: 0.5,
-      minROE: 8
+      maxPriceToBook: 2.5,
+      minROE: 10,
+      maxDebtToEquity: 0.6,
+      isUndervalued: true,
+      minFinancialStrengthScore: 50
     }
   },
   {
-    id: 'reit-income',
-    name: 'High Income REITs',
-    description: 'Real Estate Investment Trusts with high dividend yields',
+    id: 'reit-income-powerhouses',
+    name: 'REIT Income Powerhouses',
+    description: 'High-quality REITs with excellent dividend yields and FFO growth',
     category: 'income',
+    tags: ['reit', 'real-estate', 'monthly-income'],
+    difficulty: 'Intermediate',
+    expectedResults: 30,
     criteria: {
       isREIT: true,
-      minYield: 5,
-      maxPayoutRatio: 90
+      minYield: 4.5,
+      maxPayoutRatio: 85,
+      minMarketCap: 1000000000, // $1B
+      hasPositiveFCF: true
     }
   },
   {
-    id: 'utility-income',
-    name: 'Utility Income Stocks',
-    description: 'Stable utility companies with consistent dividends',
-    category: 'income',
+    id: 'international-dividends',
+    name: 'International Dividend Stocks',
+    description: 'High-quality dividend stocks from developed international markets',
+    category: 'international',
+    tags: ['international', 'diversification', 'global'],
+    difficulty: 'Advanced',
+    expectedResults: 60,
     criteria: {
-      isUtility: true,
-      minYield: 3,
-      maxPayoutRatio: 75,
-      minYearsOfGrowth: 10
+      minYield: 2.5,
+      minMarketCap: 5000000000, // $5B
+      excludeSectors: ['Financials'], // Often regulated differently internationally
+      minFinancialStrengthScore: 70,
+      countries: ['Canada', 'United Kingdom', 'Germany', 'Switzerland', 'Australia', 'Japan']
+    }
+  },
+  {
+    id: 'esg-dividend-leaders',
+    name: 'ESG Dividend Leaders',
+    description: 'Sustainable companies with strong ESG scores and growing dividends',
+    category: 'esg',
+    tags: ['esg', 'sustainable', 'responsible'],
+    difficulty: 'Intermediate',
+    expectedResults: 35,
+    criteria: {
+      minYield: 2,
+      minESGScore: 75,
+      isESGLeader: true,
+      minYearsOfGrowth: 5,
+      minMarketCap: 3000000000, // $3B
+      hasRevenueGrowth: true
+    }
+  },
+  {
+    id: 'monthly-dividend-income',
+    name: 'Monthly Dividend Income',
+    description: 'Stocks and funds that pay dividends monthly for steady income',
+    category: 'income',
+    tags: ['monthly', 'steady-income', 'cash-flow'],
+    difficulty: 'Beginner',
+    expectedResults: 25,
+    criteria: {
+      minYield: 5,
+      // This would need special logic to identify monthly payers
+      maxPayoutRatio: 90,
+      minMarketCap: 500000000 // $500M
+    }
+  },
+  {
+    id: 'tech-dividend-growers',
+    name: 'Technology Dividend Growers',
+    description: 'Technology companies with growing dividends and innovation focus',
+    category: 'growth',
+    tags: ['technology', 'innovation', 'growth'],
+    difficulty: 'Advanced',
+    expectedResults: 20,
+    criteria: {
+      sectors: ['Technology', 'Communication Services'],
+      minDividendGrowth: 10,
+      minYield: 1,
+      maxPE: 30,
+      minROE: 15,
+      hasEarningsGrowth: true,
+      minRevenueGrowth: 5
     }
   }
 ];
@@ -222,6 +439,12 @@ class StockScreenerService {
           }
 
           // Calculate additional metrics
+          const pe = quote.c && profile.eps ? quote.c / profile.eps : 0;
+          const debtToEquity = profile.totalDebt && profile.totalEquity ? 
+            profile.totalDebt / profile.totalEquity : 0;
+          const performance52Week = quote.c && quote.w52h && quote.w52l ? 
+            ((quote.c - quote.w52l) / (quote.w52h - quote.w52l)) * 100 : 0;
+          
           const result: ScreenerResult = {
             symbol: stock.symbol,
             name: profile.name || stock.symbol,
@@ -229,28 +452,113 @@ class StockScreenerService {
             industry: profile.finnhubIndustry || 'Unknown',
             price: quote.c || 0,
             marketCap: profile.marketCapitalization || 0,
+            exchange: profile.exchange || 'NASDAQ',
+            country: profile.country || 'US',
             
-            dividendYield: stock.currentYield,
-            dividendGrowth: stock.dividendGrowth,
-            payoutRatio: stock.payoutRatio,
-            yearsOfGrowth: stock.yearsOfGrowth,
-            sustainabilityScore: stock.sustainabilityScore,
+            // Dividend Data
+            dividendYield: stock.currentYield || 0,
+            dividendGrowth: stock.dividendGrowth || 0,
+            dividendGrowth5Y: stock.dividendGrowth || 0, // Would need historical data
+            dividendGrowth10Y: stock.dividendGrowth || 0, // Would need historical data
+            payoutRatio: stock.payoutRatio || 0,
+            fcfPayoutRatio: stock.payoutRatio || 0, // Simplified for now
+            yearsOfGrowth: stock.yearsOfGrowth || 0,
+            consecutiveGrowthYears: stock.yearsOfGrowth || 0,
+            sustainabilityScore: stock.sustainabilityScore || 0,
+            dividendSafetyScore: stock.sustainabilityScore || 0,
             
-            pe: quote.c && profile.eps ? quote.c / profile.eps : 0,
+            // Financial Metrics
+            pe,
+            peg: pe && stock.dividendGrowth ? pe / stock.dividendGrowth : 0,
+            priceToBook: profile.priceToBookRatio || 0,
+            priceToSales: profile.priceToSalesRatio || 0,
+            priceToFCF: 0, // Would need FCF data
             roe: profile.roe || 0,
-            debtToEquity: profile.totalDebt && profile.totalEquity ? 
-              profile.totalDebt / profile.totalEquity : 0,
+            roa: profile.roa || 0,
+            roic: profile.roic || 0,
+            debtToEquity,
+            currentRatio: profile.currentRatio || 0,
+            quickRatio: profile.quickRatio || 0,
+            interestCoverage: 0, // Would need interest expense data
             
-            performance52Week: quote.c && quote.w52h && quote.w52l ? 
-              ((quote.c - quote.w52l) / (quote.w52h - quote.w52l)) * 100 : 0,
+            // Profitability
+            grossMargin: 0, // Would need income statement data
+            operatingMargin: 0,
+            profitMargin: 0,
+            fcfMargin: 0,
+            
+            // Growth Metrics
+            revenueGrowth: 0, // Would need historical revenue data
+            revenueGrowth5Y: 0,
+            epsGrowth: 0,
+            epsGrowth5Y: 0,
+            fcfGrowth: 0,
+            
+            // Performance
+            performance52Week,
+            performance1Month: 0, // Would need historical price data
+            performance3Month: 0,
+            performance6Month: 0,
+            performance1Year: performance52Week,
+            performance3Year: 0,
+            performance5Year: 0,
             volume: quote.v || 0,
+            avgVolume: quote.v || 0, // Simplified
             
+            // Technical Indicators
+            beta: profile.beta || 1,
+            rsi: 50, // Would need technical analysis
+            ma50: quote.c || 0, // Simplified
+            ma200: quote.c || 0, // Simplified
+            priceVsMa50: 0,
+            priceVsMa200: 0,
+            
+            // Credit & Quality
+            creditRating: 'BBB', // Default rating
+            financialStrengthScore: stock.sustainabilityScore || 50,
+            profitabilityRank: 50,
+            
+            // ESG
+            esgScore: 0, // Would need ESG data provider
+            environmentScore: 0,
+            socialScore: 0,
+            governanceScore: 0,
+            
+            // Valuation Metrics
+            intrinsicValue: quote.c || 0, // Simplified
+            fairValue: quote.c || 0, // Simplified
+            upside: 0,
+            
+            // Ratings & Scores
             overallScore: this.calculateOverallScore(stock, quote, profile),
-            recommendation: this.getRecommendation(stock, quote, profile),
+            dividendScore: stock.sustainabilityScore || 50,
+            financialScore: 50,
+            valuationScore: 50,
+            qualityScore: 50,
+            momentumScore: 50,
             
+            recommendation: this.getRecommendation(stock, quote, profile),
+            analystRating: 3, // Default neutral rating
+            priceTarget: quote.c || 0,
+            analystCount: 0,
+            
+            // Special Categories
             isDividendAristocrat: DIVIDEND_ARISTOCRATS.includes(stock.symbol),
             isDividendKing: DIVIDEND_KINGS.includes(stock.symbol),
-            isREIT: profile.finnhubIndustry?.toLowerCase().includes('reit') || false
+            isDividendContender: (stock.yearsOfGrowth || 0) >= 10 && (stock.yearsOfGrowth || 0) < 25,
+            isDividendChampion: (stock.yearsOfGrowth || 0) >= 25,
+            isREIT: profile.finnhubIndustry?.toLowerCase().includes('reit') || false,
+            isESGLeader: false, // Would need ESG data
+            
+            // Risk Metrics
+            volatility: 0, // Would need historical volatility calculation
+            maxDrawdown: 0,
+            sharpeRatio: 0,
+            sortinRatio: 0,
+            
+            // Last Updated
+            lastUpdated: new Date().toISOString(),
+            dataQuality: 'Medium' as const
           };
 
           enhancedResults.push(result);

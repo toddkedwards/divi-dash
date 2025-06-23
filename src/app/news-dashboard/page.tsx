@@ -13,7 +13,11 @@ import {
   Clock,
   Filter,
   Bell,
-  Settings
+  Settings,
+  Brain,
+  Shield,
+  Activity,
+  Zap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -27,27 +31,27 @@ interface DashboardTab {
 const DASHBOARD_TABS: DashboardTab[] = [
   {
     id: 'overview',
-    name: 'Market Overview',
-    icon: BarChart3,
-    description: 'General market news and sentiment analysis'
+    name: 'Market Intelligence',
+    icon: Brain,
+    description: 'AI-powered market analysis and sentiment intelligence'
   },
   {
     id: 'dividends',
-    name: 'Dividend Focus',
-    icon: DollarSign,
-    description: 'Dividend announcements, cuts, and increases'
+    name: 'Dividend Intelligence',
+    icon: Shield,
+    description: 'Advanced dividend safety alerts and risk analysis'
   },
   {
     id: 'portfolio',
-    name: 'My Portfolio',
-    icon: TrendingUp,
-    description: 'News specific to your holdings'
+    name: 'Portfolio Intelligence',
+    icon: Activity,
+    description: 'Personalized news and impact analysis for your holdings'
   },
   {
     id: 'alerts',
-    name: 'Alert Setup',
-    icon: Bell,
-    description: 'Configure news alerts and notifications'
+    name: 'Smart Alerts',
+    icon: Zap,
+    description: 'Configure intelligent news alerts and notifications'
   }
 ];
 
@@ -114,6 +118,7 @@ export default function NewsDashboardPage() {
           <NewsSection 
             showDividendOnly={false}
             className="w-full"
+            enhancedMode={true}
           />
         );
         
@@ -123,6 +128,7 @@ export default function NewsDashboardPage() {
             showDividendOnly={true}
             selectedSymbols={holdings.map(h => h.symbol)}
             className="w-full"
+            enhancedMode={true}
           />
         );
         
@@ -132,13 +138,14 @@ export default function NewsDashboardPage() {
             selectedSymbols={holdings.map(h => h.symbol)}
             showDividendOnly={false}
             className="w-full"
+            enhancedMode={true}
           />
         ) : (
           <Card className="p-8 text-center">
             <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-semibold mb-2">No Holdings Found</h3>
             <p className="text-gray-600 mb-4">
-              Add some stocks to your portfolio to see personalized news.
+              Add some stocks to your portfolio to see personalized news intelligence.
             </p>
             <a
               href="/positions"
@@ -152,12 +159,23 @@ export default function NewsDashboardPage() {
       case 'alerts':
         return (
           <div className="space-y-6">
-            {/* Alert Configuration */}
+            {/* Enhanced Alert Configuration for Phase 2 */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Settings className="w-5 h-5 mr-2" />
-                Configure News Alerts
+                Smart News Alert Configuration
               </h3>
+              
+              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Brain className="w-4 h-4 mr-2 text-blue-500" />
+                  <span className="text-sm font-medium text-blue-700">AI-Powered Intelligence</span>
+                </div>
+                <p className="text-sm text-blue-600">
+                  Our enhanced alert system uses AI to analyze sentiment, detect dividend risks, 
+                  and identify market-moving news before it impacts your portfolio.
+                </p>
+              </div>
               
               <div className="mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -197,32 +215,33 @@ export default function NewsDashboardPage() {
                       disabled={!newAlert.value.trim()}
                       className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Add Alert
+                      Add Smart Alert
                     </button>
                   </div>
                 </div>
-                
-                <div className="text-sm text-gray-600">
-                  <p><strong>Keyword alerts:</strong> Get notified when news contains specific terms</p>
-                  <p><strong>Symbol alerts:</strong> Track news for specific stocks</p>
-                  <p><strong>Sentiment alerts:</strong> Alert when sentiment drops below threshold (-1 to 1)</p>
-                </div>
               </div>
-              
+
               {/* Active Alerts */}
               <div>
-                <h4 className="font-medium mb-3">Active Alerts ({newsAlerts.filter(a => a.enabled).length})</h4>
+                <h4 className="font-medium mb-3 flex items-center">
+                  <Bell className="w-4 h-4 mr-2" />
+                  Active Alerts ({newsAlerts.filter(alert => alert.enabled).length})
+                </h4>
+                
                 {newsAlerts.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <Bell className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <div className="text-center py-6 text-gray-500">
+                    <Bell className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No alerts configured yet.</p>
+                    <p className="text-sm">Add your first smart alert above to get started.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {newsAlerts.map((alert) => (
-                      <div
+                      <motion.div
                         key={alert.id}
-                        className={`p-3 border rounded-lg flex items-center justify-between ${
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className={`flex items-center justify-between p-3 border rounded-lg ${
                           alert.enabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
                         }`}
                       >
@@ -231,55 +250,76 @@ export default function NewsDashboardPage() {
                             alert.enabled ? 'bg-green-500' : 'bg-gray-400'
                           }`} />
                           <div>
-                            <div className="font-medium">
+                            <p className="font-medium text-sm">
                               {alert.type.charAt(0).toUpperCase() + alert.type.slice(1)}: {alert.value}
-                            </div>
+                            </p>
                             {alert.lastTriggered && (
-                              <div className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-500">
                                 Last triggered: {alert.lastTriggered.toLocaleDateString()}
-                              </div>
+                              </p>
                             )}
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center space-x-2">
                           <button
                             onClick={() => toggleAlert(alert.id)}
-                            className={`px-3 py-1 text-sm rounded ${
+                            className={`px-3 py-1 text-xs rounded transition-colors ${
                               alert.enabled 
-                                ? 'bg-green-600 text-white hover:bg-green-700' 
-                                : 'bg-gray-600 text-white hover:bg-gray-700'
+                                ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' 
+                                : 'bg-green-100 text-green-800 hover:bg-green-200'
                             }`}
                           >
-                            {alert.enabled ? 'Enabled' : 'Disabled'}
+                            {alert.enabled ? 'Disable' : 'Enable'}
                           </button>
                           <button
                             onClick={() => removeAlert(alert.id)}
-                            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                            className="px-3 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors"
                           >
                             Remove
                           </button>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 )}
               </div>
             </Card>
-            
-            {/* Alert Tips */}
-            <Card className="p-6">
-              <h4 className="font-medium mb-3 flex items-center">
-                <AlertTriangle className="w-5 h-5 mr-2 text-yellow-500" />
-                Alert Tips
-              </h4>
-              <div className="space-y-2 text-sm text-gray-600">
-                <p>• Use keyword alerts for terms like "dividend increase", "earnings beat", or "acquisition"</p>
-                <p>• Set symbol alerts for stocks you don't own but want to monitor</p>
-                <p>• Sentiment alerts help catch sudden negative news about your holdings</p>
-                <p>• Alerts are checked every 15 minutes during market hours</p>
-              </div>
-            </Card>
+
+            {/* Enhanced Alert Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="p-4">
+                <div className="flex items-center">
+                  <Bell className="w-8 h-8 text-blue-500 mr-3" />
+                  <div>
+                    <p className="text-2xl font-bold">{newsAlerts.length}</p>
+                    <p className="text-sm text-gray-600">Total Alerts</p>
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-4">
+                <div className="flex items-center">
+                  <Zap className="w-8 h-8 text-green-500 mr-3" />
+                  <div>
+                    <p className="text-2xl font-bold">{newsAlerts.filter(a => a.enabled).length}</p>
+                    <p className="text-sm text-gray-600">Active Alerts</p>
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-4">
+                <div className="flex items-center">
+                  <AlertTriangle className="w-8 h-8 text-orange-500 mr-3" />
+                  <div>
+                    <p className="text-2xl font-bold">
+                      {newsAlerts.filter(a => a.lastTriggered).length}
+                    </p>
+                    <p className="text-sm text-gray-600">Recently Triggered</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         );
         
@@ -289,105 +329,89 @@ export default function NewsDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        {/* Enhanced Header */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
-            <Newspaper className="w-8 h-8 mr-3 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              News & Sentiment Dashboard
-            </h1>
+            <Brain className="w-8 h-8 text-purple-600 mr-3" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                News Intelligence Dashboard
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                AI-powered news analysis, sentiment intelligence, and dividend safety monitoring
+              </p>
+            </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-300">
-            Stay informed with AI-powered news analysis and sentiment tracking for dividend investing.
-          </p>
+          
+          {/* Feature Highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+              <div className="flex items-center">
+                <Brain className="w-4 h-4 text-purple-600 mr-2" />
+                <span className="text-sm font-medium text-purple-800">AI Sentiment Analysis</span>
+              </div>
+            </div>
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center">
+                <Shield className="w-4 h-4 text-blue-600 mr-2" />
+                <span className="text-sm font-medium text-blue-800">Dividend Safety Alerts</span>
+              </div>
+            </div>
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center">
+                <Activity className="w-4 h-4 text-green-600 mr-2" />
+                <span className="text-sm font-medium text-green-800">Market Impact Analysis</span>
+              </div>
+            </div>
+            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-center">
+                <Zap className="w-4 h-4 text-orange-600 mr-2" />
+                <span className="text-sm font-medium text-orange-800">Real-time Intelligence</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            {DASHBOARD_TABS.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <motion.button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                    activeTab === tab.id
-                      ? 'bg-white dark:bg-gray-700 shadow-md text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Icon className="w-5 h-5 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium">{tab.name}</div>
-                    <div className="text-xs opacity-75 hidden lg:block">
-                      {tab.description}
+        {/* Enhanced Tab Navigation */}
+        <div className="mb-8">
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <nav className="-mb-px flex space-x-8">
+              {DASHBOARD_TABS.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                      activeTab === tab.id
+                        ? 'border-purple-500 text-purple-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <Icon className="w-5 h-5 mr-2" />
+                      {tab.name}
                     </div>
-                  </div>
-                </motion.button>
-              );
-            })}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
-        </div>
-
-        {/* Quick Stats Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Portfolio Holdings</div>
-                <div className="text-2xl font-bold">{holdings.length}</div>
-              </div>
-              <TrendingUp className="w-8 h-8 text-green-500" />
-            </div>
-          </Card>
           
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Active Alerts</div>
-                <div className="text-2xl font-bold">{newsAlerts.filter(a => a.enabled).length}</div>
-              </div>
-              <Bell className="w-8 h-8 text-blue-500" />
-            </div>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Last Updated</div>
-                <div className="text-sm font-medium">
-                  {new Date().toLocaleTimeString()}
-                </div>
-              </div>
-              <Clock className="w-8 h-8 text-orange-500" />
-            </div>
-          </Card>
-          
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">News Sources</div>
-                <div className="text-2xl font-bold">12+</div>
-              </div>
-              <Newspaper className="w-8 h-8 text-purple-500" />
-            </div>
-          </Card>
+          {/* Tab Description */}
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {DASHBOARD_TABS.find(tab => tab.id === activeTab)?.description}
+            </p>
+          </div>
         </div>
 
         {/* Tab Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <div className="space-y-6">
           {renderTabContent()}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

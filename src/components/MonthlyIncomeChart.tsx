@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, addMonths, startOfMonth } from 'date-fns';
 import { Holding } from '@/data/holdings';
+import { ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
 
 interface MonthlyIncomeChartProps {
   holdings: Holding[];
@@ -60,102 +61,130 @@ export default function MonthlyIncomeChart({ holdings, className = '' }: Monthly
   const data = calculateMonthlyIncome();
   const totalAnnualIncome = data.reduce((sum, month) => sum + month.income, 0);
   const monthlyAverage = totalAnnualIncome / 12;
-  const dailyAverage = totalAnnualIncome / 365;
+  const currentYear = format(addMonths(new Date(), yearOffset * 12), 'yyyy');
 
   return (
-    <div className={`p-6 rounded-lg bg-white dark:bg-gray-800 shadow-sm ${className}`}>
+    <div className={`rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            ${totalAnnualIncome.toFixed(2)}
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
+            Monthly Dividend Income
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Annual Income</p>
+          <div className="flex items-baseline gap-3">
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">
+              ${monthlyAverage.toFixed(0)}
+            </span>
+            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+              <TrendingUp size={16} />
+              <span className="text-sm font-medium">Monthly Average</span>
+            </div>
+          </div>
         </div>
-        <div className="flex gap-2">
+        
+        {/* Year Navigation */}
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setYearOffset(yearOffset - 1)}
-            className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title="Previous Year"
           >
-            {format(addMonths(new Date(), (yearOffset - 1) * 12), 'yyyy')}
+            <ChevronLeft size={20} className="text-gray-600 dark:text-gray-400" />
           </button>
-          <button
-            onClick={() => setYearOffset(0)}
-            className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-          >
-            One year ahead
-          </button>
+          <span className="text-lg font-semibold text-gray-900 dark:text-white min-w-[60px] text-center">
+            {currentYear}
+          </span>
           <button
             onClick={() => setYearOffset(yearOffset + 1)}
-            className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title="Next Year"
           >
-            {format(addMonths(new Date(), (yearOffset + 1) * 12), 'yyyy')}
+            <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Monthly</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            ${monthlyAverage.toFixed(2)}
+      {/* Summary Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Annual Total
+          </p>
+          <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+            ${totalAnnualIncome.toFixed(0)}
           </p>
         </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Daily</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            ${dailyAverage.toFixed(2)}
+        <div className="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Quarterly Avg
+          </p>
+          <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+            ${(totalAnnualIncome / 4).toFixed(0)}
           </p>
         </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Yet to receive</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            ${(totalAnnualIncome - data[0].income).toFixed(2)}
+        <div className="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Weekly Avg
+          </p>
+          <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+            ${(totalAnnualIncome / 52).toFixed(0)}
           </p>
         </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Yield</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {(holdings.reduce((sum, h) => sum + (h.dividendYield || 0), 0) / holdings.length).toFixed(2)}%
+        <div className="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Daily Avg
+          </p>
+          <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+            ${(totalAnnualIncome / 365).toFixed(2)}
           </p>
         </div>
       </div>
 
-      <div className="h-[300px] w-full">
+      {/* Chart */}
+      <div className="h-[280px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+          <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
             <defs>
-              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="hsl(142.1, 70.6%, 45.3%)" className="dark:stop-color-[hsl(142.1,_70.6%,_45.3%)]" />
-                <stop offset="100%" stopColor="hsl(142.1, 76.2%, 36.3%)" className="dark:stop-color-[hsl(142.1,_76.2%,_36.3%)]" />
+              <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#059669" stopOpacity={0.6} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="month"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'currentColor', fontSize: 12 }}
-              className="text-gray-500 dark:text-gray-400"
+              tick={{ 
+                fill: 'currentColor', 
+                fontSize: 12,
+                fontWeight: 500
+              }}
+              className="text-gray-600 dark:text-gray-400"
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'currentColor', fontSize: 12 }}
+              tick={{ 
+                fill: 'currentColor', 
+                fontSize: 12,
+                fontWeight: 500
+              }}
               tickFormatter={(value) => `$${value.toFixed(0)}`}
-              className="text-gray-500 dark:text-gray-400"
+              className="text-gray-600 dark:text-gray-400"
             />
             <Tooltip
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 animate-in fade-in zoom-in duration-200">
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl p-4">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
                         {data.month} {data.year}
                       </p>
-                      <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                      <p className="text-lg font-bold text-green-600 dark:text-green-400 mt-1">
                         ${data.income.toFixed(2)}
                       </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {data.declared ? 'Declared' : 'Estimated'}
                       </p>
                     </div>
@@ -166,9 +195,9 @@ export default function MonthlyIncomeChart({ holdings, className = '' }: Monthly
             />
             <Bar
               dataKey="income"
-              fill="url(#colorIncome)"
-              radius={[4, 4, 0, 0]}
-              className="animate-in fade-in slide-in-from-bottom duration-500"
+              fill="url(#incomeGradient)"
+              radius={[6, 6, 0, 0]}
+              className="hover:opacity-80 transition-opacity"
             />
           </BarChart>
         </ResponsiveContainer>

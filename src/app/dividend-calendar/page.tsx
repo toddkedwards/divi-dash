@@ -16,10 +16,10 @@ import {
   isWeekend
 } from '../../utils/dateUtils';
 import { companyInfo } from "@/utils/companyLogos";
-import { format } from "date-fns";
-import { addMonths, isSameDay, isSameMonth } from "date-fns";
+import { format, addDays, isSameDay, isSameMonth, startOfMonth, endOfMonth, isAfter, isBefore } from "date-fns";
+import { addMonths } from "date-fns";
 import { getNextBusinessDay, getPreviousBusinessDay } from "@/utils/dateUtils";
-import { Calendar as CalendarIcon, Download } from '@geist-ui/icons';
+import { Calendar as CalendarIcon, Download, ChevronLeft, ChevronRight, Filter, TrendingUp, TrendingDown } from '@geist-ui/icons';
 import { useToast } from '@/components/ToastProvider';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { getDividends } from '@/utils/finnhub';
@@ -252,6 +252,7 @@ export default function DividendCalendarPage() {
   const [filterToDate, setFilterToDate] = useState('');
   const [detailsPayout, setDetailsPayout] = useState<Payout | null>(null);
   const [viewMode, setViewMode] = useState<'month' | 'day'>(settings.calendarDefaultView);
+  const [showFilters, setShowFilters] = useState(false);
   const isProUser = false; // TODO: Replace with real check
   const [notificationSettings, setNotificationSettings] = useState({
     defaultTiming: 7, // Default days before event
@@ -341,6 +342,23 @@ export default function DividendCalendarPage() {
     acc[p.date.toISOString().slice(0, 10)].push(p);
     return acc;
   }, {});
+
+  // Get upcoming dividends (next 30 days)
+  const today = new Date();
+  const thirtyDaysFromNow = addDays(today, 30);
+  const upcomingPayouts = filteredPayouts
+    .filter(p => isAfter(p.date, today) && isBefore(p.date, thirtyDaysFromNow))
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+    .slice(0, 10); // Show top 10 upcoming
+
+  // Calculate monthly summary for current view
+  const currentMonthStart = startOfMonth(selectedDate);
+  const currentMonthEnd = endOfMonth(selectedDate);
+  const currentMonthPayouts = filteredPayouts.filter(p => 
+    isAfter(p.date, currentMonthStart) && isBefore(p.date, currentMonthEnd)
+  );
+  const monthlyTotal = currentMonthPayouts.reduce((sum, p) => sum + p.amount, 0);
+  const monthlyCount = currentMonthPayouts.length;
 
   // Compute all events for the selected month
   const selectedMonthEvents = Object.values(payoutsByDate).flat().filter(p =>
@@ -441,18 +459,41 @@ export default function DividendCalendarPage() {
     if (view !== 'month') return null;
     const payouts = payoutsByDate[date.toISOString().slice(0, 10)] || [];
     if (payouts.length === 0) return null;
+    
+    const totalAmount = payouts.reduce((sum, p) => sum + p.amount, 0);
+    const hasExDate = payouts.some(p => p.type === 'ex-date');
+    const hasPayment = payouts.some(p => p.type === 'payment-date');
+    
     return (
-      <div className="flex flex-wrap justify-center gap-0.5 mt-1">
-        {payouts.slice(0, 3).map((payout, index) => (
-          <span
-            key={index}
-            className={`w-2 h-2 rounded-full inline-block bg-primary`}
-            title={`${payout.symbol} $${payout.amount.toFixed(2)}`}
-          />
-        ))}
-        {payouts.length > 3 && <span className="text-xs text-gray-400">+{payouts.length - 3}</span>}
+      <div className="flex flex-col items-center gap-1 mt-1">
+        <div className="flex flex-wrap justify-center gap-0.5">
+          {hasExDate && (
+            <span className="w-2 h-2 rounded-full bg-orange-500" title="Ex-Date" />
+          )}
+          {hasPayment && (
+            <span className="w-2 h-2 rounded-full bg-green-500" title="Payment Date" />
+          )}
+        </div>
+        {totalAmount > 0 && (
+          <span className="text-xs font-medium text-green-600 dark:text-green-400">
+            ${totalAmount.toFixed(0)}
+          </span>
+        )}
       </div>
     );
+  };
+
+  // Navigation functions
+  const goToPreviousMonth = () => {
+    setSelectedDate(prev => addMonths(prev, -1));
+  };
+
+  const goToNextMonth = () => {
+    setSelectedDate(prev => addMonths(prev, 1));
+  };
+
+  const goToToday = () => {
+    setSelectedDate(new Date());
   };
 
   // Request notification permission
@@ -590,255 +631,480 @@ export default function DividendCalendarPage() {
   const eventsToShow = viewMode === 'month' ? selectedMonthEvents : selectedDayEvents;
 
   return (
-    <main className="max-w-6xl mx-auto my-10 px-4 bg-white dark:bg-[#18181b] min-h-screen">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Dividend Calendar</h1>
-        <div className="relative">
+    <main className="max-w-7xl mx-auto my-8 px-4 bg-white dark:bg-[#18181b] min-h-screen">
+      {/* Enhanced Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-2">
+            Dividend Calendar
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Track your dividend payments and ex-dates
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
           <button
-            ref={exportBtnRef}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-semibold shadow hover:bg-primary-dark active:bg-primary-dark transition-colors"
-            onClick={() => setExportOpen((v) => !v)}
-            aria-label="Export Calendar"
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              showFilters 
+                ? 'bg-green-500 text-white' 
+                : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+            }`}
           >
-            <CalendarIcon size={20} /> Export Calendar
+            <Filter size={18} />
+            Filters
           </button>
-          {exportOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-xl rounded-xl z-50">
-              <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100 dark:hover:bg-zinc-800 text-left text-gray-900 dark:text-gray-100" onClick={() => { downloadICS(allPayouts, 'dividends.ics'); setExportOpen(false); toast({ title: 'Success', description: 'iCal file downloaded!', variant: 'default' }); }}>
-                <Download size={18} /> Export to iCal (.ics)
-              </button>
-              <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100 dark:hover:bg-zinc-800 text-left text-gray-900 dark:text-gray-100" onClick={() => { downloadICS(allPayouts, 'dividends.ics'); setExportOpen(false); toast({ title: 'Info', description: 'Google Calendar: Import the .ics file at calendar.google.com > Settings > Import & Export.', variant: 'default' }); }}>
-                <CalendarIcon size={18} /> Export to Google Calendar
-              </button>
-              <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100 dark:hover:bg-zinc-800 text-left text-gray-900 dark:text-gray-100" onClick={() => { downloadICS(allPayouts, 'dividends.ics'); setExportOpen(false); toast({ title: 'Success', description: 'Outlook .ics file downloaded!', variant: 'default' }); }}>
-                <CalendarIcon size={18} /> Export to Outlook
-              </button>
-            </div>
-          )}
+          <div className="relative">
+            <button
+              ref={exportBtnRef}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500 text-white font-medium shadow hover:bg-green-600 transition-colors"
+              onClick={() => setExportOpen((v) => !v)}
+              aria-label="Export Calendar"
+            >
+              <Download size={18} />
+              Export
+            </button>
+            {exportOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-xl rounded-xl z-50">
+                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100 dark:hover:bg-zinc-800 text-left text-gray-900 dark:text-gray-100" onClick={() => { downloadICS(allPayouts, 'dividends.ics'); setExportOpen(false); toast({ title: 'Success', description: 'iCal file downloaded!', variant: 'default' }); }}>
+                  <Download size={18} /> Export to iCal (.ics)
+                </button>
+                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100 dark:hover:bg-zinc-800 text-left text-gray-900 dark:text-gray-100" onClick={() => { downloadICS(allPayouts, 'dividends.ics'); setExportOpen(false); toast({ title: 'Info', description: 'Google Calendar: Import the .ics file at calendar.google.com > Settings > Import & Export.', variant: 'default' }); }}>
+                  <CalendarIcon size={18} /> Export to Google Calendar
+                </button>
+                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100 dark:hover:bg-zinc-800 text-left text-gray-900 dark:text-gray-100" onClick={() => { downloadICS(allPayouts, 'dividends.ics'); setExportOpen(false); toast({ title: 'Success', description: 'Outlook .ics file downloaded!', variant: 'default' }); }}>
+                  <CalendarIcon size={18} /> Export to Outlook
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <div className="flex flex-col gap-10 items-start">
-        <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-sm rounded-2xl p-6 mb-4 relative">
-          <div className="mb-6 flex flex-wrap gap-4 items-end">
+
+      {/* Filters Panel */}
+      {showFilters && (
+        <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-6 mb-6">
+          <div className="flex flex-wrap gap-4 items-end">
             <div>
-              <label className="block text-xs font-semibold mb-1">Company</label>
-              <select value={filterCompany} onChange={e => setFilterCompany(e.target.value)} className="rounded border px-2 py-1">
-                <option value="">All</option>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company</label>
+              <select 
+                value={filterCompany} 
+                onChange={e => setFilterCompany(e.target.value)} 
+                className="rounded-lg border border-gray-300 dark:border-zinc-600 px-3 py-2 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="">All Companies</option>
                 {companies.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1">Min Amount</label>
-              <input type="number" value={filterMinAmount} onChange={e => setFilterMinAmount(e.target.value)} className="rounded border px-2 py-1" placeholder="0" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Amount</label>
+              <input 
+                type="number" 
+                value={filterMinAmount} 
+                onChange={e => setFilterMinAmount(e.target.value)} 
+                className="rounded-lg border border-gray-300 dark:border-zinc-600 px-3 py-2 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100" 
+                placeholder="$0" 
+              />
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1">Max Amount</label>
-              <input type="number" value={filterMaxAmount} onChange={e => setFilterMaxAmount(e.target.value)} className="rounded border px-2 py-1" placeholder="" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Amount</label>
+              <input 
+                type="number" 
+                value={filterMaxAmount} 
+                onChange={e => setFilterMaxAmount(e.target.value)} 
+                className="rounded-lg border border-gray-300 dark:border-zinc-600 px-3 py-2 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100" 
+                placeholder="No limit" 
+              />
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1">From Date</label>
-              <input type="date" value={filterFromDate} onChange={e => setFilterFromDate(e.target.value)} className="rounded border px-2 py-1" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">From Date</label>
+              <input 
+                type="date" 
+                value={filterFromDate} 
+                onChange={e => setFilterFromDate(e.target.value)} 
+                className="rounded-lg border border-gray-300 dark:border-zinc-600 px-3 py-2 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100" 
+              />
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1">To Date</label>
-              <input type="date" value={filterToDate} onChange={e => setFilterToDate(e.target.value)} className="rounded border px-2 py-1" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">To Date</label>
+              <input 
+                type="date" 
+                value={filterToDate} 
+                onChange={e => setFilterToDate(e.target.value)} 
+                className="rounded-lg border border-gray-300 dark:border-zinc-600 px-3 py-2 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100" 
+              />
             </div>
-          </div>
-          <div className="calendar-container w-full max-w-none">
-            <Calendar
-              className={styles.calendar}
-              onChange={(date) => {
-                if (date instanceof Date) {
-                  const nyseDate = toNYSETimezone(date);
-                  setSelectedDate(nyseDate);
-                  setForm({ 
-                    symbol: '', 
-                    amount: 0, 
-                    date: nyseDate, 
-                    type: 'payment-date' 
-                  });
-                  setEditingIndex(-1);
-                  setViewMode('day');
-                  if ((payoutsByDate[nyseDate.toISOString().slice(0, 10)] || []).length > 0) {
-                    setPopoverDate(nyseDate);
-                  } else {
-                    setPopoverDate(null);
-                  }
-                }
+            <button
+              onClick={() => {
+                setFilterCompany('');
+                setFilterMinAmount('');
+                setFilterMaxAmount('');
+                setFilterFromDate('');
+                setFilterToDate('');
               }}
-              value={selectedDate}
-              tileContent={tileContent}
-            />
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            >
+              Clear All
+            </button>
           </div>
-          {/* Popover for events on a day */}
-          {popoverDate && (
-            <div ref={popoverRef} className="absolute left-1/2 top-1/2 z-50 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-xl rounded-xl p-6 min-w-[320px] max-w-[90vw]" style={{ transform: 'translate(-50%, -50%)' }}>
-              <div className="flex justify-between items-center mb-2">
-                <div className="font-bold text-lg text-gray-900 dark:text-gray-100">Events on {format(popoverDate, 'MMM d, yyyy')}</div>
-                <button onClick={closePopover} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold">×</button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Main Calendar Section */}
+        <div className="xl:col-span-2">
+          <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-6 mb-6">
+            {/* Calendar Header with Navigation */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={goToPreviousMonth}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {format(selectedDate, 'MMMM yyyy')}
+                </h2>
+                <button
+                  onClick={goToNextMonth}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
+                >
+                  <ChevronRight size={20} />
+                </button>
               </div>
-              <div className="divide-y divide-gray-200 dark:divide-zinc-700">
-                {(payoutsByDate[popoverDate.toISOString().slice(0, 10)] || []).map((payout, idx) => (
-                  <div key={idx} className="py-3 flex items-center gap-3">
-                    <span className={`w-3 h-3 rounded-full inline-block bg-primary`}></span>
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-900 dark:text-gray-100">{payout.symbol}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">${payout.amount.toFixed(2)} • {payout.type === 'ex-date' ? 'Ex-Date' : 'Payment'}</div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={goToToday}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 rounded-lg transition-colors"
+                >
+                  Today
+                </button>
+              </div>
+            </div>
+
+            {/* Month Summary */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="bg-gray-50 dark:bg-zinc-700 rounded-xl p-4">
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                  Total This Month
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  ${monthlyTotal.toFixed(2)}
+                </div>
+              </div>
+              <div className="bg-gray-50 dark:bg-zinc-700 rounded-xl p-4">
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                  Events This Month
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  {monthlyCount}
+                </div>
+              </div>
+              <div className="bg-gray-50 dark:bg-zinc-700 rounded-xl p-4">
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                  Avg Per Event
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  ${monthlyCount > 0 ? (monthlyTotal / monthlyCount).toFixed(2) : '0.00'}
+                </div>
+              </div>
+            </div>
+
+            {/* Calendar */}
+            <div className="calendar-container w-full">
+              <Calendar
+                className={styles.calendar}
+                onChange={(date) => {
+                  if (date instanceof Date) {
+                    const nyseDate = toNYSETimezone(date);
+                    setSelectedDate(nyseDate);
+                    setForm({ 
+                      symbol: '', 
+                      amount: 0, 
+                      date: nyseDate, 
+                      type: 'payment-date' 
+                    });
+                    setEditingIndex(-1);
+                    setViewMode('day');
+                    if ((payoutsByDate[nyseDate.toISOString().slice(0, 10)] || []).length > 0) {
+                      setPopoverDate(nyseDate);
+                    } else {
+                      setPopoverDate(null);
+                    }
+                  }
+                }}
+                value={selectedDate}
+                tileContent={tileContent}
+              />
+            </div>
+
+            {/* Legend */}
+            <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-gray-200 dark:border-zinc-700">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Ex-Date</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Payment Date</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Selected Day Events */}
+          {selectedDayEvents.length > 0 && (
+            <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                Events on {format(selectedDate, 'MMMM d, yyyy')}
+              </h3>
+              <div className="space-y-3">
+                {selectedDayEvents.map((payout, idx) => {
+                  const company = companyInfo[payout.symbol];
+                  return (
+                    <div key={idx} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-600 transition-colors">
+                      {company?.logo && (
+                        <img 
+                          src={company.logo} 
+                          alt={`${payout.symbol} logo`}
+                          className="w-10 h-10 rounded-lg object-cover"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-gray-900 dark:text-gray-100">
+                            {payout.symbol}
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            payout.type === 'ex-date' 
+                              ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                              : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          }`}>
+                            {payout.type === 'ex-date' ? 'Ex-Date' : 'Payment'}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {company?.name || payout.symbol}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                          ${payout.amount.toFixed(2)}
+                        </div>
+                        {payout.growth && (
+                          <div className={`flex items-center gap-1 text-sm ${
+                            payout.growth > 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {payout.growth > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                            {payout.growth.toFixed(1)}%
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <button onClick={() => setDetailsPayout(payout)} className="ml-2 text-xs text-blue-600 dark:text-blue-300 underline">Details</button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-              {detailsPayout && (
-                <div className="mt-4 p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg">
-                  <div className="font-semibold mb-2">{detailsPayout.symbol} Dividend History</div>
-                  <table className="w-full text-xs mb-2">
-                    <thead><tr><th>Date</th><th>Amount</th><th>Growth</th></tr></thead>
+            </div>
+          )}
+        </div>
+
+        {/* Upcoming Dividends Sidebar */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Upcoming Dividends
+            </h3>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Next 30 days
+            </div>
+            
+            {upcomingPayouts.length === 0 ? (
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                No upcoming dividends
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {upcomingPayouts.map((payout, idx) => {
+                  const company = companyInfo[payout.symbol];
+                  const daysUntil = Math.ceil((payout.date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                  
+                  return (
+                    <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-zinc-700 rounded-xl">
+                      {company?.logo && (
+                        <img 
+                          src={company.logo} 
+                          alt={`${payout.symbol} logo`}
+                          className="w-8 h-8 rounded object-cover"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                            {payout.symbol}
+                          </span>
+                          <span className={`w-2 h-2 rounded-full ${
+                            payout.type === 'ex-date' ? 'bg-orange-500' : 'bg-green-500'
+                          }`} />
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          {format(payout.date, 'MMM d')} • {daysUntil} day{daysUntil !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-gray-900 dark:text-gray-100">
+                          ${payout.amount.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Add Payout */}
+          <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Quick Add Payout
+            </h3>
+            <form onSubmit={handleAddPayout} className="space-y-4">
+              <input
+                name="symbol"
+                placeholder="Symbol (e.g., AAPL)"
+                value={form.symbol}
+                onChange={handleFormChange}
+                required
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              />
+              <input
+                name="amount"
+                placeholder="Amount ($)"
+                type="number"
+                step="0.01"
+                value={form.amount}
+                onChange={handleFormChange}
+                required
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              />
+              <input
+                name="date"
+                type="date"
+                value={form.date.toISOString().split('T')[0]}
+                onChange={handleFormChange}
+                required
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100"
+              />
+              <select
+                name="type"
+                value={form.type}
+                onChange={handleFormChange}
+                required
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="payment-date">Payment Date</option>
+                <option value="ex-date">Ex-Dividend Date</option>
+              </select>
+              <button
+                type="submit"
+                className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-medium transition-colors"
+              >
+                {editingIndex >= 0 ? 'Update' : 'Add'} Payout
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* Popover for events on a day */}
+      {popoverDate && (
+        <div ref={popoverRef} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={closePopover}>
+          <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-xl rounded-2xl p-6 min-w-[320px] max-w-[90vw] max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                {format(popoverDate, 'MMMM d, yyyy')}
+              </h3>
+              <button onClick={closePopover} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold">
+                ×
+              </button>
+            </div>
+            <div className="space-y-3">
+              {(payoutsByDate[popoverDate.toISOString().slice(0, 10)] || []).map((payout, idx) => {
+                const company = companyInfo[payout.symbol];
+                return (
+                  <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-zinc-800 rounded-xl">
+                    {company?.logo && (
+                      <img 
+                        src={company.logo} 
+                        alt={`${payout.symbol} logo`}
+                        className="w-10 h-10 rounded-lg object-cover"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-gray-900 dark:text-gray-100">
+                          {payout.symbol}
+                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          payout.type === 'ex-date' 
+                            ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                            : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                        }`}>
+                          {payout.type === 'ex-date' ? 'Ex-Date' : 'Payment'}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        ${payout.amount.toFixed(2)} • {company?.name || payout.symbol}
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setDetailsPayout(payout)} 
+                      className="text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium"
+                    >
+                      Details
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            {detailsPayout && (
+              <div className="mt-6 p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
+                <div className="font-bold text-gray-900 dark:text-gray-100 mb-3">
+                  {detailsPayout.symbol} Dividend History
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-zinc-700">
+                        <th className="text-left py-2 text-gray-600 dark:text-gray-400">Date</th>
+                        <th className="text-left py-2 text-gray-600 dark:text-gray-400">Amount</th>
+                        <th className="text-left py-2 text-gray-600 dark:text-gray-400">Growth</th>
+                      </tr>
+                    </thead>
                     <tbody>
-                      {initialHoldings.find(h => h.symbol === detailsPayout.symbol)?.dividendHistory.map((d, i) => (
-                        <tr key={i}><td>{d.paymentDate}</td><td>${d.amount.toFixed(2)}</td><td>{d.growth ? `${d.growth.toFixed(2)}%` : '-'}</td></tr>
+                      {initialHoldings.find(h => h.symbol === detailsPayout.symbol)?.dividendHistory?.slice(0, 5).map((d, i) => (
+                        <tr key={i} className="border-b border-gray-100 dark:border-zinc-700">
+                          <td className="py-2 text-gray-900 dark:text-gray-100">{d.paymentDate}</td>
+                          <td className="py-2 text-gray-900 dark:text-gray-100">${d.amount.toFixed(2)}</td>
+                          <td className={`py-2 ${d.growth && d.growth > 0 ? 'text-green-600' : d.growth && d.growth < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                            {d.growth ? `${d.growth.toFixed(1)}%` : '-'}
+                          </td>
+                        </tr>
                       ))}
                     </tbody>
                   </table>
-                  <button onClick={() => setDetailsPayout(null)} className="mt-2 text-xs text-gray-500 underline">Close</button>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-10 w-full">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              className={`px-4 py-2 rounded ${viewMode === 'month' ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-100'}`}
-              onClick={() => setViewMode('month')}
-            >
-              Month View
-            </button>
-            <button
-              className={`px-4 py-2 rounded ${viewMode === 'day' ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-100'}`}
-              onClick={() => setViewMode('day')}
-              disabled={selectedDayEvents.length === 0}
-            >
-              Day View
-            </button>
-            {viewMode === 'day' && (
-              <button
-                className="ml-4 px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-                onClick={() => setViewMode('month')}
-              >
-                Back to Month
-              </button>
-            )}
-          </div>
-          <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-sm rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">
-              Events on {format(selectedDate, 'MMM d, yyyy')}
-            </h2>
-            {eventsToShow.length === 0 && (
-              <div className="text-center text-gray-500 dark:text-gray-400 py-8">No dividend events for this period.</div>
-            )}
-            <table className="w-full border-collapse bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow mb-6">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-zinc-800">
-                  <th className="text-left p-3 text-gray-700 dark:text-gray-200">Symbol</th>
-                  <th className="text-left p-3 text-gray-700 dark:text-gray-200">Amount</th>
-                  <th className="text-left p-3 text-gray-700 dark:text-gray-200">Type</th>
-                  <th className="text-left p-3 text-gray-700 dark:text-gray-200">Source</th>
-                  <th className="text-left p-3"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {eventsToShow.map((p, i) => (
-                  <tr key={i} className={`border-t border-gray-100 dark:border-zinc-800 ${p.date.toISOString().slice(0, 10) === todayStr ? 'bg-yellow-100 dark:bg-yellow-900' : ''}`}>
-                    <td className="p-3 text-gray-900 dark:text-gray-100">{p.symbol}</td>
-                    <td className="p-3 text-gray-900 dark:text-gray-100">${p.amount.toFixed(2)}</td>
-                    <td className="p-3">
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${p.type === 'ex-date' ? 'bg-primary' : 'bg-primary'} text-white`}>
-                        {p.type === 'ex-date' ? 'Ex-Date' : 'Payment'}
-                      </span>
-                    </td>
-                    <td className="p-3 text-gray-900 dark:text-gray-100">{p.source || (p.auto ? 'Auto' : 'Custom')}</td>
-                    <td className="p-3">
-                      {!p.auto && (
-                        <>
-                          <button
-                            onClick={() => handleEditPayout(userPayouts.findIndex(x => x.date.toISOString() === p.date.toISOString() && x.symbol === p.symbol))}
-                            className="mr-2 px-3 py-1 rounded bg-primary hover:bg-primary-dark text-white text-sm"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeletePayout(userPayouts.findIndex(x => x.date.toISOString() === p.date.toISOString() && x.symbol === p.symbol))}
-                            className="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-sm"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <button
-            className="mb-2 px-5 py-2 rounded bg-primary text-white font-semibold hover:bg-primary-dark active:bg-primary-dark transition-colors w-fit"
-            onClick={() => setShowPayoutForm(v => !v)}
-          >
-            {showPayoutForm ? 'Hide Add/Edit Payout' : 'Add/Edit Payout'}
-          </button>
-          {showPayoutForm && (
-            <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-sm rounded-2xl p-6 mb-2">
-              <h2 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">Add/Edit Payout</h2>
-              <form onSubmit={handleAddPayout} className="flex flex-col gap-3 mb-6">
-                <input
-                  name="symbol"
-                  placeholder="Symbol"
-                  value={form.symbol}
-                  onChange={handleFormChange}
-                  required
-                  className="px-3 py-2 rounded border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
-                />
-                <input
-                  name="amount"
-                  placeholder="Amount"
-                  type="number"
-                  value={form.amount}
-                  onChange={handleFormChange}
-                  required
-                  className="px-3 py-2 rounded border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
-                />
-                <input
-                  name="date"
-                  placeholder="Date"
-                  type="date"
-                  value={form.date.toISOString().split('T')[0]}
-                  onChange={handleFormChange}
-                  required
-                  className="px-3 py-2 rounded border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
-                />
-                <select
-                  name="type"
-                  value={form.type}
-                  onChange={handleFormChange}
-                  required
-                  className="px-3 py-2 rounded border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
+                <button 
+                  onClick={() => setDetailsPayout(null)} 
+                  className="mt-3 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 >
-                  <option value="payment-date">Payment Date</option>
-                  <option value="ex-date">Ex-Dividend Date</option>
-                </select>
-                <button
-                  type="submit"
-                  className="bg-primary hover:bg-primary-dark text-white rounded px-5 py-2 font-semibold text-base"
-                >
-                  {editingIndex >= 0 ? 'Save' : 'Add'} Payout
+                  Close Details
                 </button>
-              </form>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
-        {renderNotificationSettings()}
-      </div>
+      )}
+
       <ConfirmDialog
         open={deleteIndex !== null}
         title="Delete Payout?"
@@ -848,18 +1114,6 @@ export default function DividendCalendarPage() {
         onConfirm={handleDeletePayoutConfirm}
         onCancel={handleDeletePayoutCancel}
       />
-      <div className="mt-8">
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={settings.notificationsEnabled} onChange={e => {
-            if (!isProUser) {
-              toast({ title: 'Pro Feature', description: 'Priority notifications are a Divly Pro feature. Upgrade to enable!', variant: 'default' });
-              return;
-            }
-            updateSetting('notificationsEnabled', e.target.checked);
-          }} />
-          Enable browser notifications for dividends <ProBadge />
-        </label>
-      </div>
     </main>
   );
 }

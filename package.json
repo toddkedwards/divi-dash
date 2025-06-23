@@ -14,6 +14,8 @@
     "packages/*"
   ],
   "dependencies": {
+    "@divly/core": "file:../packages/core",
+    "@divly/data-models": "file:../packages/data-models",
     "@geist-ui/icons": "^1.0.2",
     "@geist-ui/react": "^2.2.5",
     "@opentelemetry/api": "^1.9.0",
@@ -21,7 +23,7 @@
     "date-fns": "^4.1.0",
     "firebase": "^11.9.1",
     "firebase-admin": "^13.4.0",
-    "framer-motion": "^12.18.1",
+    "framer-motion": "^12.19.1",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.516.0",
@@ -32,9 +34,7 @@
     "react-dom": "^18.2.0",
     "recharts": "^2.15.3",
     "stripe": "^18.2.1",
-    "tailwind-merge": "^3.3.1",
-    "@divly/core": "file:../packages/core",
-    "@divly/data-models": "file:../packages/data-models"
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.3.3",
