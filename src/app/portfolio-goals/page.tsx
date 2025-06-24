@@ -211,7 +211,7 @@ export default function PortfolioGoalsPage() {
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-gray-600">Monthly Contributions</h3>
-              <Calendar className="w-5 h-5 text-purple-500" />
+              <Calendar className="w-5 h-5 text-green-600" />
             </div>
             <div className="text-2xl font-bold text-gray-900">
               {formatCurrency(goals.reduce((sum, goal) => sum + goal.monthlyContribution, 0))}

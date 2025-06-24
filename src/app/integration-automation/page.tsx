@@ -206,7 +206,7 @@ const IntegrationAutomationPage: React.FC = () => {
 
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="h-5 w-5 text-purple-500" />
+                  <Calendar className="h-5 w-5 text-green-600" />
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Sync Schedules</span>
                 </div>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">

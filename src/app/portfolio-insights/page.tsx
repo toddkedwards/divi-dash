@@ -79,7 +79,7 @@ export default function PortfolioInsightsPage() {
             <select
               value={timeframe}
               onChange={(e) => setTimeframe(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="1M">1 Month</option>
               <option value="3M">3 Months</option>
@@ -119,7 +119,7 @@ export default function PortfolioInsightsPage() {
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-gray-600">Annual Dividend Income</h3>
-              <Percent className="w-5 h-5 text-purple-500" />
+              <Percent className="w-5 h-5 text-green-600" />
             </div>
             <div className="text-2xl font-bold text-gray-900">{formatCurrency(18450)}</div>
             <div className="flex items-center text-sm mt-1">
@@ -166,11 +166,11 @@ export default function PortfolioInsightsPage() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
-                      ? 'border-purple-500 text-purple-600'
+                      ? 'border-green-600 text-green-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  <tab.icon className="w-4 h-4" />
+                  <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
                   <span>{tab.label}</span>
                 </button>
               ))}
@@ -406,14 +406,14 @@ export default function PortfolioInsightsPage() {
                       ].map((sector) => (
                         <div key={sector.sector} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center space-x-3">
-                            <sector.icon className="w-5 h-5 text-purple-500" />
+                            <sector.icon className="w-5 h-5 text-green-600" />
                             <span className="font-medium text-gray-900">{sector.sector}</span>
                           </div>
                           <div className="flex items-center space-x-2">
                             <span className="font-medium text-gray-900">{sector.avgYield.toFixed(2)}%</span>
                             <div className="w-16 h-2 bg-purple-200 rounded">
                               <div 
-                                className="h-2 bg-purple-500 rounded"
+                                className="h-2 bg-green-600 rounded"
                                 style={{ width: `${(sector.avgYield / 6) * 100}%` }}
                               ></div>
                             </div>

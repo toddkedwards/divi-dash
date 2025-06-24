@@ -80,7 +80,7 @@ const StockScreenerPage = () => {
 
             <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-4 hover:border-green-300 dark:hover:border-green-600 transition-colors">
               <div className="flex items-center gap-2 mb-2">
-                <Award className="h-5 w-5 text-purple-500" />
+                <Award className="h-5 w-5 text-green-600" />
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                   Kings
                 </span>
@@ -205,7 +205,7 @@ const StockScreenerPage = () => {
               <p className="text-purple-100 text-sm mb-4">
                 Identify companies rapidly increasing their dividend payments
               </p>
-              <button className="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-purple-50 transition-colors">
+              <button className="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-green-50 transition-colors">
                 Find Growth <ChevronRight className="inline h-4 w-4 ml-1" />
               </button>
             </div>
@@ -239,7 +239,7 @@ const StockScreenerPage = () => {
                         <Award className="h-5 w-5 text-yellow-500" />
                       )}
                       {selectedStock.isDividendKing && (
-                        <Award className="h-5 w-5 text-purple-500" />
+                        <Award className="h-5 w-5 text-green-600" />
                       )}
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">

@@ -245,7 +245,7 @@ export default function NewsSection({
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             AI Sentiment Analysis
           </span>
-          <Brain className="w-4 h-4 text-purple-500" />
+          <Brain className="w-4 h-4 text-green-600" />
         </div>
         
         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -434,7 +434,7 @@ export default function NewsSection({
             </h3>
             {enhancedMode && (
               <div className="flex items-center space-x-2">
-                <Brain className="w-5 h-5 text-purple-500" />
+                <Brain className="w-5 h-5 text-green-600" />
                 <span className="text-sm text-purple-600 font-medium">AI-Powered</span>
               </div>
             )}

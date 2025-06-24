@@ -270,11 +270,11 @@ export default function AIRecommendationsPage() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
-                    ? 'border-purple-500 text-purple-600'
+                    ? 'border-green-600 text-green-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
                 <span>{tab.label}</span>
                 <span className="bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">
                   {tab.count}
@@ -297,7 +297,7 @@ export default function AIRecommendationsPage() {
                   <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="all">All Recommendations</option>
                     <option value="buy">Buy Signals Only</option>
@@ -332,7 +332,7 @@ export default function AIRecommendationsPage() {
                   key={rec.symbol}
                   className={`bg-white border rounded-lg p-6 cursor-pointer transition-all hover:shadow-lg ${
                     selectedRecommendation === rec.symbol
-                      ? 'border-purple-500 ring-2 ring-purple-200'
+                      ? 'border-green-600 ring-2 ring-green-200'
                       : 'border-gray-200'
                   }`}
                   onClick={() => setSelectedRecommendation(
@@ -499,7 +499,7 @@ export default function AIRecommendationsPage() {
                         <p className="text-sm text-green-600 font-medium">Predicted Annual</p>
                         <p className="text-2xl font-bold text-green-900">{formatCurrency(pred.predictedDividend.nextYear)}</p>
                       </div>
-                      <div className="text-center bg-purple-50 p-4 rounded-lg">
+                      <div className="text-center bg-green-50 p-4 rounded-lg">
                         <p className="text-sm text-purple-600 font-medium">Growth Rate</p>
                         <p className="text-xl font-bold text-purple-900">{formatPercentage(pred.growthRate.predicted)}</p>
                       </div>

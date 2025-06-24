@@ -348,7 +348,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
-            <Search className="h-6 w-6 text-purple-500" />
+            <Search className="h-6 w-6 text-green-600" />
             Stock Screener
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
@@ -360,7 +360,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
           {results.length > 0 && (
             <button
               onClick={exportResults}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
               <Download className="h-4 w-4" />
               Export
@@ -388,11 +388,11 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
               onClick={() => setActiveTab(tab.id as 'presets' | 'custom')}
               className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === tab.id
-                  ? 'border-purple-500 text-purple-600 dark:text-purple-400'
+                  ? 'border-green-600 text-green-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
               }`}
             >
-              <tab.icon className="h-4 w-4" />
+              <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
               {tab.label}
             </button>
           ))}
@@ -412,7 +412,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                   onClick={() => setSelectedCategory(category.id)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedCategory === category.id
-                      ? 'bg-purple-500 text-white'
+                      ? 'bg-green-600 text-white'
                       : 'bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-600'
                   }`}
                 >
@@ -436,7 +436,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                 whileHover={{ scale: 1.02 }}
                 className={`p-5 border-2 rounded-2xl cursor-pointer transition-all ${
                   selectedPreset === preset.id
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 shadow-lg'
+                    ? 'border-green-600 bg-green-50 dark:bg-purple-900/20 shadow-lg'
                     : 'border-gray-200 dark:border-zinc-700 hover:border-purple-300 dark:hover:border-purple-600 bg-white dark:bg-zinc-800'
                 }`}
                 onClick={() => setSelectedPreset(preset.id)}
@@ -444,7 +444,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                 <div className="flex items-start gap-3 mb-4">
                   <div className={`p-3 rounded-xl transition-colors ${
                     selectedPreset === preset.id 
-                      ? 'bg-purple-500' 
+                      ? 'bg-green-600' 
                       : 'bg-gradient-to-r from-purple-500 to-purple-600'
                   }`}>
                     {preset.category === 'aristocrats' && <Award className="h-5 w-5 text-white" />}
@@ -507,7 +507,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
           <button
             onClick={handlePresetScreen}
             disabled={loading || !selectedPreset}
-            className="w-full lg:w-auto px-8 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-colors"
+            className="w-full lg:w-auto px-8 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-colors"
           >
             {loading ? <LoadingSpinner size="sm" /> : <Search className="h-5 w-5" />}
             {loading ? 'Screening...' : `Run ${selectedPreset ? PRESET_SCREENS.find(p => p.id === selectedPreset)?.name || 'Screen' : 'Screen'}`}
@@ -524,7 +524,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
             <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-purple-500" />
+                  <DollarSign className="h-5 w-5 text-green-600" />
                   Basic Filters
                 </h3>
                 <button
@@ -548,7 +548,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       basic: { ...prev.basic, minPrice: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="0"
                   />
                 </div>
@@ -564,7 +564,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       basic: { ...prev.basic, maxPrice: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="∞"
                   />
                 </div>
@@ -580,7 +580,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       basic: { ...prev.basic, minMarketCap: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="1"
                   />
                 </div>
@@ -596,7 +596,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       basic: { ...prev.basic, maxMarketCap: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="∞"
                   />
                 </div>
@@ -623,7 +623,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       dividend: { ...prev.dividend, minYield: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="2.0"
                   />
                 </div>
@@ -640,7 +640,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       dividend: { ...prev.dividend, maxYield: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="∞"
                   />
                 </div>
@@ -657,7 +657,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       dividend: { ...prev.dividend, minDividendGrowth: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="0"
                   />
                 </div>
@@ -673,7 +673,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                       ...prev, 
                       dividend: { ...prev.dividend, maxPayoutRatio: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="80"
                   />
                 </div>
@@ -707,7 +707,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                         ...prev, 
                         special: { ...prev.special, [key]: e.target.checked }
                       }))}
-                      className="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      className="mt-1 h-4 w-4 text-purple-600 focus:ring-green-500 border-gray-300 rounded"
                     />
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -735,7 +735,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                   {/* Financial Metrics */}
                   <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-4">
-                      <BarChart3 className="h-5 w-5 text-purple-500" />
+                      <BarChart3 className="h-5 w-5 text-green-600" />
                       Financial Metrics
                     </h3>
                     
@@ -752,7 +752,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             financial: { ...prev.financial, minPE: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="0"
                         />
                       </div>
@@ -769,7 +769,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             financial: { ...prev.financial, maxPE: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="∞"
                         />
                       </div>
@@ -786,7 +786,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             financial: { ...prev.financial, minROE: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="0"
                         />
                       </div>
@@ -803,7 +803,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             financial: { ...prev.financial, maxDebtToEquity: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="∞"
                         />
                       </div>
@@ -830,7 +830,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             valuation: { ...prev.valuation, maxPriceToBook: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="∞"
                         />
                       </div>
@@ -847,7 +847,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             valuation: { ...prev.valuation, maxPriceToSales: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="∞"
                         />
                       </div>
@@ -863,7 +863,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             quality: { ...prev.quality, minFinancialStrengthScore: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="0"
                         />
                       </div>
@@ -879,7 +879,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             ...prev, 
                             quality: { ...prev.quality, minESGScore: e.target.value }
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="0"
                         />
                       </div>
@@ -895,7 +895,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
             <button
               onClick={handleCustomScreen}
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-colors"
+              className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-colors"
             >
               {loading ? <LoadingSpinner size="sm" /> : <Search className="h-5 w-5" />}
               {loading ? 'Screening...' : 'Run Custom Screen'}
@@ -1020,7 +1020,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                                   <Award className="h-4 w-4 text-yellow-500" />
                                 )}
                                 {stock.isDividendKing && (
-                                  <Award className="h-4 w-4 text-purple-500" />
+                                  <Award className="h-4 w-4 text-green-600" />
                                 )}
                               </div>
                               <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
@@ -1074,7 +1074,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                             </div>
                             <div className="w-12 bg-gray-200 dark:bg-zinc-600 rounded-full h-2">
                               <div 
-                                className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                                className="bg-green-600 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${stock.overallScore}%` }}
                               />
                             </div>
@@ -1092,7 +1092,7 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
                                 e.stopPropagation();
                                 // Add to watchlist logic would go here
                               }}
-                              className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
+                              className="p-2 text-gray-400 hover:text-green-600 transition-colors"
                             >
                               <Star className="h-4 w-4" />
                             </button>

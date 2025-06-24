@@ -1,0 +1,19 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Three ascending bars -->
+  <rect x="5" y="28" width="7" height="8" rx="1.5" fill="white"/>
+  <rect x="14" y="22" width="7" height="14" rx="1.5" fill="white"/>
+  <rect x="23" y="16" width="7" height="20" rx="1.5" fill="white"/>
+  
+  <!-- Stem separate from middle bar, positioned between middle and right bar -->
+  <line x1="20" y1="20" x2="20" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Left leaf - pointing upward -->
+  <ellipse cx="16" cy="8" rx="3" ry="5" fill="white" transform="rotate(-20 16 8)"/>
+  <!-- Left leaf vein -->
+  <path d="M20 12 Q18 10 16 8" stroke="#18b64a" stroke-width="1" fill="none"/>
+  
+  <!-- Right leaf - pointing upward -->
+  <ellipse cx="24" cy="8" rx="3" ry="5" fill="white" transform="rotate(20 24 8)"/>
+  <!-- Right leaf vein -->
+  <path d="M20 12 Q22 10 24 8" stroke="#18b64a" stroke-width="1" fill="none"/>
+</svg> 

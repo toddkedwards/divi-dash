@@ -21,6 +21,7 @@ import alertsService, { Alert, AlertRule } from '../utils/alertsService';
 interface AlertsPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  className?: string;
 }
 
 export default function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {

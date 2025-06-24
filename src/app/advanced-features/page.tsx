@@ -96,6 +96,7 @@ const totalPortfolioValue = mockHoldings.reduce((sum, holding) => sum + holding.
 export default function AdvancedFeaturesPage() {
   const [activeFeature, setActiveFeature] = useState<'analytics' | 'alerts' | 'composition'>('analytics');
   const [isLoading, setIsLoading] = useState(false);
+  const [showAlertsModal, setShowAlertsModal] = useState(false);
 
   const features = [
     {
@@ -258,7 +259,25 @@ export default function AdvancedFeaturesPage() {
           )}
 
           {activeFeature === 'alerts' && (
-            <AlertsPanel className="w-full" />
+            <div className="w-full">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Alert Management</h3>
+                <p className="text-gray-600 mb-4">
+                  Configure and monitor portfolio alerts to stay informed about important changes.
+                </p>
+                <button 
+                  onClick={() => setShowAlertsModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Open Alert Center
+                </button>
+              </div>
+              
+              <AlertsPanel 
+                isOpen={showAlertsModal} 
+                onClose={() => setShowAlertsModal(false)} 
+              />
+            </div>
           )}
 
           {activeFeature === 'composition' && (

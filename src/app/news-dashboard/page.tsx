@@ -347,7 +347,7 @@ export default function NewsDashboardPage() {
           
           {/* Feature Highlights */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-            <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+            <div className="p-3 bg-green-50 border border-purple-200 rounded-lg">
               <div className="flex items-center">
                 <Brain className="w-4 h-4 text-purple-600 mr-2" />
                 <span className="text-sm font-medium text-purple-800">AI Sentiment Analysis</span>
@@ -386,12 +386,12 @@ export default function NewsDashboardPage() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                       activeTab === tab.id
-                        ? 'border-purple-500 text-purple-600'
+                        ? 'border-green-600 text-green-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center">
-                      <Icon className="w-5 h-5 mr-2" />
+                      <Icon className={`w-5 h-5 mr-2 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
                       {tab.name}
                     </div>
                   </button>

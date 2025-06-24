@@ -82,7 +82,7 @@ export default function CommunityPage() {
               className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
             >
               <div className="flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg mb-4 mx-auto">
-                <Trophy className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <Trophy className="w-6 h-6 text-purple-600 dark:text-green-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Recognition System

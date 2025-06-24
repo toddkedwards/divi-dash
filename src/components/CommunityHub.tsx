@@ -40,7 +40,7 @@ const getColorClasses = (color: string) => {
     blue: 'border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800',
     gold: 'border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800',
     green: 'border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800',
-    purple: 'border-purple-200 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-800',
+    purple: 'border-purple-200 bg-green-50 dark:bg-purple-900/20 dark:border-purple-800',
     orange: 'border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-800',
     emerald: 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800',
     cyan: 'border-cyan-200 bg-cyan-50 dark:bg-cyan-900/20 dark:border-cyan-800',
@@ -323,11 +323,11 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
-                    ? 'border-purple-500 text-purple-600'
+                    ? 'border-green-600 text-green-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
                 <span>{tab.label}</span>
                 {tab.count > 0 && (
                   <span className="bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">
@@ -354,7 +354,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                     <select
                       value={filterCategory}
                       onChange={(e) => setFilterCategory(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="all">All Categories</option>
                       <option value="general">General</option>
@@ -371,7 +371,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                     <select
                       value={filterType}
                       onChange={(e) => setFilterType(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="all">All Types</option>
                       <option value="discussion">Discussions</option>
@@ -388,7 +388,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="recent">Most Recent</option>
                       <option value="popular">Most Popular</option>
@@ -403,7 +403,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                       placeholder="Search posts..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 w-48"
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-48"
                     />
                   </div>
                 </div>
@@ -470,7 +470,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                       <div className="mb-4">
                         <div className="flex flex-wrap gap-2">
                           {post.tags.map((tag, i) => (
-                            <span key={i} className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium flex items-center space-x-1">
+                            <span key={i} className="px-2 py-1 bg-green-50 text-purple-700 rounded-full text-xs font-medium flex items-center space-x-1">
                               <Hash className="w-3 h-3" />
                               <span>{tag}</span>
                             </span>
@@ -512,7 +512,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                           <Share2 className="w-4 h-4" />
                           <span className="text-sm font-medium">{post.shares}</span>
                         </button>
-                        <button className="flex items-center space-x-2 text-gray-500 hover:text-purple-500 transition-colors">
+                        <button className="flex items-center space-x-2 text-gray-500 hover:text-green-600 transition-colors">
                           <Bookmark className="w-4 h-4" />
                           <span className="text-sm font-medium">{post.bookmarks}</span>
                         </button>
@@ -562,7 +562,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
               {/* Top Contributors */}
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                  <Award className="w-5 h-5 text-purple-500" />
+                  <Award className="w-5 h-5 text-green-600" />
                   <span>Top Contributors</span>
                 </h3>
                 <div className="space-y-3">
@@ -572,7 +572,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                         index === 0 ? 'bg-yellow-500' :
                         index === 1 ? 'bg-gray-400' :
                         index === 2 ? 'bg-orange-500' :
-                        'bg-purple-500'
+                        'bg-green-600'
                       }`}>
                         {index < 3 ? <Crown className="w-3 h-3" /> : index + 1}
                       </div>
@@ -744,7 +744,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
                         index === 0 ? 'bg-yellow-500' :
                         index === 1 ? 'bg-gray-400' :
                         index === 2 ? 'bg-orange-500' :
-                        'bg-purple-500'
+                        'bg-green-600'
                       }`}>
                         {index < 3 ? <Crown className="w-5 h-5" /> : index + 1}
                       </div>

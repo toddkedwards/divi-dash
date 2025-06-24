@@ -187,7 +187,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
         </div>
         <div className="text-right">
           <div className="flex items-center gap-2 mb-1">
-            <Brain className="h-4 w-4 text-purple-500" />
+            <Brain className="h-4 w-4 text-green-600" />
             <span className="text-lg font-bold text-purple-600">{rec.aiScore}</span>
           </div>
           <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -294,7 +294,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
         </div>
         <div className="text-right">
           <div className="flex items-center gap-2 mb-1">
-            <Star className="h-4 w-4 text-purple-500" />
+            <Star className="h-4 w-4 text-green-600" />
             <span className="text-lg font-bold text-purple-600">{aristocrat.qualityRating}</span>
           </div>
           <span className="text-xs text-gray-500">Quality Score</span>
@@ -310,7 +310,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
           <div className="text-lg font-semibold text-green-600">{aristocrat.currentYield.toFixed(1)}%</div>
           <div className="text-xs text-green-600 font-medium">Current Yield</div>
         </div>
-        <div className="bg-purple-50 rounded-lg p-3 text-center">
+        <div className="bg-green-50 rounded-lg p-3 text-center">
           <div className="text-lg font-semibold text-purple-600">{aristocrat.avgGrowthRate.toFixed(1)}%</div>
           <div className="text-xs text-purple-600 font-medium">Avg Growth</div>
         </div>
@@ -378,7 +378,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <div className="space-y-4">
-                <div className="bg-purple-50 rounded-xl p-4">
+                <div className="bg-green-50 rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <Brain className="h-5 w-5 text-purple-600" />
                     <h4 className="font-semibold text-purple-900">AI Analysis</h4>
@@ -492,7 +492,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
                   {rec.riskLevel.toUpperCase()}
                 </div>
               </div>
-              <div className="bg-purple-50 rounded-xl p-4">
+              <div className="bg-green-50 rounded-xl p-4">
                 <h5 className="font-semibold text-purple-900 mb-2">Time Horizon</h5>
                 <div className="text-lg font-semibold text-purple-600 capitalize">{rec.timeHorizon} Term</div>
               </div>
