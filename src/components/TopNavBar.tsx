@@ -138,7 +138,7 @@ const TopNavBar = () => {
               {/* Status Indicators */}
               <div className="hidden md:flex items-center space-x-3">
                 <NetworkStatus />
-                <PWAStatus />
+                {/* <PWAStatus /> */}
               </div>
 
               {/* Settings */}
@@ -196,7 +196,7 @@ const TopNavBar = () => {
               {/* Status for mobile */}
               <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
                 <NetworkStatus />
-                <PWAStatus />
+                {/* <PWAStatus /> */}
               </div>
 
               {/* Portfolio Section */}

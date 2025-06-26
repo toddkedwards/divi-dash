@@ -15,6 +15,7 @@ export function useRealTimePrices(holdings: Holding[], refreshInterval = 30000) 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [lastManualRefresh, setLastManualRefresh] = useState<Date | null>(null);
 
   const updatePrices = useCallback(async () => {
     if (holdings.length === 0) return;
@@ -37,10 +38,31 @@ export function useRealTimePrices(holdings: Holding[], refreshInterval = 30000) 
       setPriceUpdates(updates);
       setLastUpdated(new Date());
       
-      console.log(`Updated ${updates.length} stock prices`);
+      if (updates.length > 0) {
+        console.log(`✓ Updated ${updates.length}/${holdings.length} stock prices`);
+      } else {
+        console.warn('⚠ No price updates received');
+        setError('No price data available');
+      }
     } catch (err) {
-      setError('Failed to update prices');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update prices';
+      setError(errorMessage);
       console.error('Price update error:', err);
+      
+      // Only set fallback prices if we don't have any current prices
+      setPriceUpdates(currentPrices => {
+        if (currentPrices.length === 0) {
+          console.log('Using fallback prices from holdings data');
+          return holdings.map(holding => ({
+            symbol: holding.symbol,
+            currentPrice: holding.currentPrice,
+            change: 0,
+            changePercent: 0,
+            lastUpdated: new Date()
+          }));
+        }
+        return currentPrices;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -57,10 +79,22 @@ export function useRealTimePrices(holdings: Holding[], refreshInterval = 30000) 
     return () => clearInterval(interval);
   }, [updatePrices, refreshInterval]);
 
-  // Manual refresh function
+  // Manual refresh function with debounce
   const refreshPrices = useCallback(() => {
-    updatePrices();
-  }, [updatePrices]);
+    const now = new Date();
+    const timeSinceLastRefresh = lastManualRefresh ? now.getTime() - lastManualRefresh.getTime() : Infinity;
+    
+    // Prevent rapid clicking - minimum 2 seconds between manual refreshes
+    if (timeSinceLastRefresh < 2000) {
+      console.log('Manual refresh blocked - too soon since last refresh');
+      return;
+    }
+    
+    if (!isLoading) {
+      setLastManualRefresh(now);
+      updatePrices();
+    }
+  }, [updatePrices, isLoading, lastManualRefresh]);
 
   // Get current price for a specific symbol
   const getCurrentPrice = useCallback((symbol: string): PriceUpdate | null => {

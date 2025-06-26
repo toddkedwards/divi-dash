@@ -94,7 +94,7 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
   const [profileCache, setProfileCache] = useState<Record<string, { name: string; logo: string }>>({});
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [prevCloses, setPrevCloses] = useState<Record<string, number>>({});
-  const { priceUpdates, isLoading, refreshPrices } = useRealTimePrices(holdings, 0);
+  const { priceUpdates, isLoading, refreshPrices } = useRealTimePrices(holdings, 86400000); // 24 hours - effectively disables auto-refresh
   const [editingSymbol, setEditingSymbol] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<{ shares: string; avgPrice: string; sector: string }>({ shares: '', avgPrice: '', sector: '' });
   const [saving, setSaving] = useState(false);
@@ -485,9 +485,55 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
         return (
           <div className="flex items-center gap-2">
             {editingSymbol === holding.symbol ? (
-              <input value={editValues.sector || ''} name="sector" onChange={handleEditChange} className="w-20 px-2 py-1 border rounded" />
+              <>
+                <input
+                  value={editValues.sector || ''}
+                  name="sector"
+                  onChange={handleEditChange}
+                  className="w-24 px-2 py-1 border rounded"
+                  placeholder="Enter sector"
+                  onBlur={() => saveEdit(holding.symbol, holding)}
+                  onKeyDown={e => { if (e.key === 'Enter') saveEdit(holding.symbol, holding); }}
+                  disabled={saving}
+                  autoFocus
+                />
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => saveEdit(holding.symbol, holding)}
+                  disabled={saving}
+                  className="ml-1"
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setEditingSymbol(null)}
+                  disabled={saving}
+                  className="ml-1"
+                >
+                  Cancel
+                </Button>
+              </>
             ) : (
-              holding.sector || 'Unknown'
+              <>
+                {holding.sector && holding.sector !== 'Unknown' ? (
+                  holding.sector
+                ) : (
+                  <>
+                    <span className="text-gray-400 italic">Unknown</span>
+                    <Button
+                      variant="outline"
+                      size="md"
+                      className="ml-1"
+                      onClick={() => setEditingSymbol(holding.symbol)}
+                    >
+                      Edit
+                    </Button>
+                  </>
+                )}
+              </>
             )}
           </div>
         );

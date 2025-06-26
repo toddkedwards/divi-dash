@@ -5,6 +5,7 @@ import { getHoldings, saveHolding } from '@/utils/holdingsLocal';
 import { useAuth } from './AuthContext';
 import { loadPortfolios, savePortfolios } from '@/lib/firestore';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { getStockProfile } from '@/utils/finnhub';
 
 export interface Portfolio {
   id: string;
@@ -270,6 +271,32 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const refreshHoldings = () => {
     // No-op for now; could reload from backend
   };
+
+  // In the PortfolioProvider, after loading holdings:
+  useEffect(() => {
+    async function fillMissingSectors() {
+      const updatedHoldings = await Promise.all(holdings.map(async (h) => {
+        if (!h.sector || h.sector === 'Unknown') {
+          try {
+            const profile = await getStockProfile(h.symbol);
+            if (profile && profile.finnhubIndustry) {
+              return { ...h, sector: profile.finnhubIndustry };
+            }
+          } catch (e) {
+            // Optionally, prompt user to fill in sector manually
+            // For now, just return as is
+          }
+        }
+        return h;
+      }));
+      setPortfolios(prev => prev.map(p => ({
+        ...p,
+        holdings: updatedHoldings
+      })));
+    }
+    fillMissingSectors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const contextValue = useMemo(() => ({
     portfolios,
