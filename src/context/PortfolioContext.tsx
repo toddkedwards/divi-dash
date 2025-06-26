@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from 'react';
-import { Holding } from '@/data/holdings';
+import { Holding, holdings as sampleHoldings } from '@/data/holdings';
 import { getHoldings, saveHolding } from '@/utils/holdingsLocal';
 import { useAuth } from './AuthContext';
 import { loadPortfolios, savePortfolios } from '@/lib/firestore';
@@ -36,7 +36,7 @@ export interface PortfolioContextType {
 const defaultPortfolio: Portfolio = { 
   id: 'default', 
   name: 'My Portfolio', 
-  holdings: [] 
+  holdings: sampleHoldings // Use sample holdings by default
 };
 
 const defaultContextValue: PortfolioContextType = {
@@ -46,7 +46,7 @@ const defaultContextValue: PortfolioContextType = {
   createPortfolio: () => {},
   renamePortfolio: () => {},
   deletePortfolio: () => {},
-  holdings: [],
+  holdings: sampleHoldings, // Use sample holdings by default
   addHolding: () => {},
   removeHolding: () => {},
   updateHolding: () => {},
@@ -153,15 +153,21 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
         selectedId = '';
       }
       
-      // Ensure at least one portfolio exists
+      // Ensure at least one portfolio exists with sample data
       if (loaded.length === 0) {
         const defaultPortfolio: Portfolio = { 
           id: Math.random().toString(36).substr(2, 9), 
           name: 'My Portfolio', 
-          holdings: [] 
+          holdings: sampleHoldings // Use sample holdings when no data exists
         };
         loaded = [defaultPortfolio];
         selectedId = defaultPortfolio.id;
+      } else {
+        // If portfolios exist but are empty, populate with sample data
+        loaded = loaded.map(portfolio => ({
+          ...portfolio,
+          holdings: portfolio.holdings.length === 0 ? sampleHoldings : portfolio.holdings
+        }));
       }
       
       // Ensure a selected portfolio is set
@@ -198,17 +204,13 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
         })();
       } else {
         // Local storage for free users or when auth is not available
-        try {
-          localStorage.setItem('portfolios', JSON.stringify(portfolios));
-          localStorage.setItem('selectedPortfolioId', selectedPortfolioId);
-        } catch (e: any) {
-          console.warn('Failed to save to localStorage:', e);
-        }
+        localStorage.setItem('portfolios', JSON.stringify(portfolios));
+        localStorage.setItem('selectedPortfolioId', selectedPortfolioId);
       }
     } catch (error) {
       console.error('Error saving portfolios:', error);
     }
-  }, [portfolios, selectedPortfolioId, user, isProUser, loading]);
+  }, [portfolios, selectedPortfolioId, loading, user, isProUser]);
 
   // Helper: get selected portfolio
   const selectedPortfolio = portfolios.find(p => p.id === selectedPortfolioId) || portfolios[0];

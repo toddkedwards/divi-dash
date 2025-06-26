@@ -10,8 +10,8 @@ import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Watchlist() {
   const { watchlist, removeFromWatchlist, addToWatchlist, syncing, syncError } = useWatchlist();
-  const { priceUpdates, isUpdating, error, updatePrices } = useRealTimePrices(
-    watchlist.map(symbol => ({ symbol, shares: 0, avgPrice: 0, currentPrice: 0, costBasis: 0, dividendYield: 0, sector: '', payoutFrequency: '', lastExDate: '', lastPaymentDate: '', nextExDate: '', nextPaymentDate: '', dividendHistory: [] }))
+  const { priceUpdates, isLoading, error, refreshPrices } = useRealTimePrices(
+    watchlist.map(symbol => ({ symbol, shares: 0, avgPrice: 0, currentPrice: 0, costBasis: 0, dividendYield: 0, sector: '', payoutFrequency: 'quarterly', lastExDate: '', lastPaymentDate: '', nextExDate: '', nextPaymentDate: '', dividendHistory: [] }))
   );
   const { addHolding } = usePortfolio();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -148,14 +148,14 @@ export default function Watchlist() {
                   );
                 })
                 .map((symbol, idx) => {
-                  const update = priceUpdates[symbol];
+                  const update = priceUpdates.find(p => p.symbol === symbol);
                   const price = update?.currentPrice;
-                  const change = update?.dailyChange;
-                  const percent = update?.dailyChangePercent;
-                  const error = update?.error;
-                  const lastUpdate = update?.lastUpdate;
-                  const previousPrice = update?.previousPrice;
-                  const priceChanged = previousPrice !== undefined && price !== previousPrice;
+                  const change = update?.change;
+                  const percent = update?.changePercent;
+                  const error = undefined; // Not tracked in PriceUpdate
+                  const lastUpdate = update?.lastUpdated;
+                  const previousPrice = undefined; // Not tracked in PriceUpdate
+                  const priceChanged = false; // Not tracked in PriceUpdate
                   const companyName = companyInfo[symbol]?.name || profileCache[symbol]?.name || symbol;
                   const logo = companyInfo[symbol]?.logo || profileCache[symbol]?.logo;
                   return (
@@ -178,7 +178,7 @@ export default function Watchlist() {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 10, opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className={priceChanged ? (price > previousPrice! ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') : ''}
+                            className={priceChanged ? (price && price > previousPrice! ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') : ''}
                           >
                             {price !== undefined && price !== 0 ? `$${price.toFixed(2)}` : '--'}
                           </motion.div>
@@ -285,7 +285,7 @@ export default function Watchlist() {
                   dividendYield: 0,
                   costBasis: Number(portfolioForm.shares) * Number(portfolioForm.costBasis),
                   sector: '',
-                  currentPrice: priceUpdates[showPortfolioModal]?.currentPrice || 0,
+                  currentPrice: priceUpdates.find(p => p.symbol === showPortfolioModal)?.currentPrice || 0,
                   payoutFrequency: 'quarterly',
                   lastExDate: '',
                   lastPaymentDate: '',

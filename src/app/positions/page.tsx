@@ -4,8 +4,7 @@ import HoldingsTable from '../../components/HoldingsTable';
 import DividendsTable from '../../components/DividendsTable';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { useDividends } from '../../context/DividendsContext';
-import { Tooltip, Card, Text, Spacer, Popover, Input } from '@geist-ui/core';
-import { Download, Upload, Copy, FileText, HelpCircle } from '@geist-ui/icons';
+import { Download, Upload, Copy, FileText, HelpCircle } from 'lucide-react';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { Dispatch, SetStateAction, FormEvent } from 'react';
@@ -468,13 +467,13 @@ export default function PositionsPage() {
     <div className="p-4 max-w-sm">
       <div className="space-y-4">
         <div>
-          <Text small type="secondary" className="font-medium">Supported Applications</Text>
+          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Supported Applications</h4>
           <p className="mt-1 text-sm text-gray-600">
             CSV files can be opened in Excel, Google Sheets, or Numbers. Use the "Copy for Spreadsheets" option to paste directly into these applications.
           </p>
         </div>
         <div>
-          <Text small type="secondary" className="font-medium">Required CSV Headers</Text>
+          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Required CSV Headers</h4>
           <div className="mt-1 space-y-1">
             {type === 'holdings' ? (
               <p className="text-sm text-gray-600">
@@ -488,7 +487,7 @@ export default function PositionsPage() {
           </div>
         </div>
         <div>
-          <Text small type="secondary" className="font-medium">Tips</Text>
+          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Tips</h4>
           <ul className="mt-1 space-y-1 text-sm text-gray-600">
             <li>• Download a sample CSV to see the correct format</li>
             <li>• Ensure all numeric values are properly formatted</li>

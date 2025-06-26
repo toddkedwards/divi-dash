@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, Edit, Trash2, Download, Upload, DollarSign, FileText } from '@geist-ui/icons';
+import { RefreshCw, Edit, Trash2, Download, Upload, DollarSign, FileText } from 'lucide-react';
 import { companyInfo } from '../utils/companyLogos';
 import { useEffect, useState, useRef } from 'react';
 import { getStockProfile, getStockQuote, getNews } from '../utils/finnhub';
@@ -94,7 +94,7 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
   const [profileCache, setProfileCache] = useState<Record<string, { name: string; logo: string }>>({});
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [prevCloses, setPrevCloses] = useState<Record<string, number>>({});
-  const { priceUpdates, isUpdating, updatePrices } = useRealTimePrices(holdings, 0);
+  const { priceUpdates, isLoading, refreshPrices } = useRealTimePrices(holdings, 0);
   const [editingSymbol, setEditingSymbol] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<{ shares: string; avgPrice: string; sector: string }>({ shares: '', avgPrice: '', sector: '' });
   const [saving, setSaving] = useState(false);
@@ -514,16 +514,16 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
       case 'Current Price':
         return (
           <div className="flex items-center gap-1 justify-end">
-            {priceUpdates[holding.symbol]?.currentPrice?.toFixed(2) || holding.currentPrice?.toFixed(2)}
-            {isUpdating && priceUpdates[holding.symbol]?.symbol === holding.symbol && (
+            {(priceUpdates.find(p => p.symbol === holding.symbol)?.currentPrice?.toFixed(2)) || holding.currentPrice?.toFixed(2)}
+            {isLoading && priceUpdates.find(p => p.symbol === holding.symbol)?.symbol === holding.symbol && (
               <span className="ml-2 text-xs text-blue-500">Updating...</span>
             )}
           </div>
         );
       case 'Daily Change': {
-        const priceUpdate = priceUpdates[holding.symbol];
-        const dailyChange = priceUpdate?.dailyChange ?? 0;
-        const dailyChangePercent = priceUpdate?.dailyChangePercent ?? 0;
+        const priceUpdate = priceUpdates.find(p => p.symbol === holding.symbol);
+        const dailyChange = priceUpdate?.change ?? 0;
+        const dailyChangePercent = priceUpdate?.changePercent ?? 0;
         const dailyChangeDisplay = (priceUpdate && typeof dailyChange === 'number' && typeof dailyChangePercent === 'number')
           ? `${dailyChange >= 0 ? '+' : ''}${dailyChange.toFixed(2)} (${dailyChangePercent >= 0 ? '+' : ''}${dailyChangePercent.toFixed(2)}%)`
           : '--';
@@ -549,7 +549,7 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
           </div>
         );
       case 'Gain/Loss': {
-        const currentPrice = priceUpdates[holding.symbol]?.currentPrice ?? holding.currentPrice;
+        const currentPrice = priceUpdates.find(p => p.symbol === holding.symbol)?.currentPrice ?? holding.currentPrice;
         const marketValue = holding.shares * currentPrice;
         const costBasis = holding.shares * holding.avgPrice;
         const gainLoss = marketValue - costBasis;
@@ -562,12 +562,14 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
           </div>
         );
       }
-      case 'Dividend Yield':
+      case 'Dividend Yield': {
+        // PriceUpdate does not have dividendYield, fallback to holding.dividendYield
         return (
           <div className="flex items-center gap-2">
-            {priceUpdates[holding.symbol]?.dividendYield ? priceUpdates[holding.symbol].dividendYield.toFixed(2) + '%' : '--'}
+            {holding.dividendYield ? holding.dividendYield.toFixed(2) + '%' : '--'}
           </div>
         );
+      }
       case 'Actions':
         return (
           <div className="flex items-center justify-center gap-2">
@@ -638,12 +640,12 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
             <Button
               variant="primary"
               size="md"
-              onClick={updatePrices}
-              disabled={isUpdating || refreshCooldown}
+              onClick={refreshPrices}
+              disabled={isLoading || refreshCooldown}
               title="Refresh prices"
               style={{ minWidth: 160 }}
             >
-              <RefreshCw size={20} /> {isUpdating ? 'Refreshing...' : refreshCooldown ? 'Try Again Soon' : 'Refresh'}
+              <RefreshCw size={20} /> {isLoading ? 'Refreshing...' : refreshCooldown ? 'Try Again Soon' : 'Refresh'}
             </Button>
             <button
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 font-semibold text-base"

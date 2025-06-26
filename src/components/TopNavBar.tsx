@@ -153,6 +153,18 @@ const TopNavBar = () => {
                 <Settings className="w-5 h-5" />
               </Link>
 
+              {/* Pricing */}
+              <Link
+                href="/pricing"
+                className={`px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+                  isActivePath('/pricing')
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                Pricing
+              </Link>
+
               {/* Upgrade */}
               <Link
                 href="/upgrade"

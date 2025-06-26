@@ -235,98 +235,265 @@ export default function PortfolioGoalsPage() {
           </div>
         </div>
 
+        {/* Tabs */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <nav className="-mb-px flex space-x-8 px-6">
+              {[
+                { id: 'goals', label: 'Goals', icon: Target },
+                { id: 'progress', label: 'Progress', icon: TrendingUp },
+                { id: 'planning', label: 'Planning', icon: Calculator },
+                { id: 'analytics', label: 'Analytics', icon: BarChart3 }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200 rounded-t-lg
+                    ${activeTab === tab.id
+                      ? 'border-green-500 text-green-500 dark:text-green-400 dark:border-green-400 bg-gray-100 dark:bg-gray-900'
+                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-400 bg-transparent'}
+                  `}
+                  style={{ minWidth: 120 }}
+                >
+                  <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
           <div className="p-6">
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {goals.map((goal) => (
-                  <div key={goal.id} className={`border-2 rounded-lg p-6 ${getPriorityColor(goal.priority)}`}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
-                          <goal.icon className="w-6 h-6 text-blue-500" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white">{goal.title}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">{goal.description}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1 ${getStatusColor(goal.status)}`}>
-                          {getStatusIcon(goal.status)}
-                          <span className="capitalize">{goal.status.replace('_', ' ')}</span>
-                        </span>
-                        <button className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm text-gray-600 dark:text-gray-300">Progress</span>
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                          <div 
-                            className="h-3 bg-blue-500 rounded-full transition-all duration-300"
-                            style={{ width: `${Math.min(getGoalProgress(goal), 100)}%` }}
-                          ></div>
-                        </div>
-                        <div className="flex justify-between items-center mt-1">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">{getGoalProgress(goal).toFixed(1)}% complete</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">{getTimeToGoal(goal)} remaining</span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-300">Monthly Contribution</div>
-                          <div className="font-medium text-gray-900 dark:text-white">{formatCurrency(goal.monthlyContribution)}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-300">Expected Return</div>
-                          <div className="font-medium text-gray-900 dark:text-white">{goal.expectedReturn.toFixed(1)}%</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-300">Target Date</div>
-                          <div className="font-medium text-gray-900 dark:text-white">{new Date(goal.targetDate).toLocaleDateString()}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-300">Priority</div>
-                          <div className={`font-medium capitalize ${
-                            goal.priority === 'high' ? 'text-red-600' :
-                            goal.priority === 'medium' ? 'text-yellow-600' :
-                            'text-green-600'
-                          }`}>
-                            {goal.priority}
+            {activeTab === 'goals' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {goals.map((goal) => (
+                    <div key={goal.id} className={`border-2 rounded-lg p-6 ${getPriorityColor(goal.priority)}`}>
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                            <goal.icon className="w-6 h-6 text-blue-500" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 dark:text-white">{goal.title}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">{goal.description}</p>
                           </div>
                         </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1 ${getStatusColor(goal.status)}`}>
+                            {getStatusIcon(goal.status)}
+                            <span className="capitalize">{goal.status.replace('_', ' ')}</span>
+                          </span>
+                          <button className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center space-x-2 text-sm">
-                          {goal.autoInvest && (
-                            <span className="flex items-center text-green-600">
-                              <Zap className="w-3 h-3 mr-1" />
-                              Auto-investing
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-600 dark:text-gray-300">Progress</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
                             </span>
-                          )}
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                            <div 
+                              className="h-3 bg-blue-500 rounded-full transition-all duration-300"
+                              style={{ width: `${Math.min(getGoalProgress(goal), 100)}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between items-center mt-1">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{getGoalProgress(goal).toFixed(1)}% complete</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{getTimeToGoal(goal)} remaining</span>
+                          </div>
                         </div>
-                        <button className="text-sm px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white transition-colors flex items-center space-x-1 shadow">
-                          <span>View Details</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </button>
+
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <div className="text-gray-600 dark:text-gray-300">Monthly Contribution</div>
+                            <div className="font-medium text-gray-900 dark:text-white">{formatCurrency(goal.monthlyContribution)}</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-600 dark:text-gray-300">Expected Return</div>
+                            <div className="font-medium text-gray-900 dark:text-white">{goal.expectedReturn.toFixed(1)}%</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-600 dark:text-gray-300">Target Date</div>
+                            <div className="font-medium text-gray-900 dark:text-white">{new Date(goal.targetDate).toLocaleDateString()}</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-600 dark:text-gray-300">Priority</div>
+                            <div className={`font-medium capitalize ${
+                              goal.priority === 'high' ? 'text-red-600' :
+                              goal.priority === 'medium' ? 'text-yellow-600' :
+                              'text-green-600'
+                            }`}>
+                              {goal.priority}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center space-x-2 text-sm">
+                            {goal.autoInvest && (
+                              <span className="flex items-center text-green-600">
+                                <Zap className="w-3 h-3 mr-1" />
+                                Auto-investing
+                              </span>
+                            )}
+                          </div>
+                          <button className="text-sm px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white transition-colors flex items-center space-x-1 shadow">
+                            <span>View Details</span>
+                            <ChevronRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'progress' && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Progress Overview</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-4">Overall Progress</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Total Progress</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {((goals.reduce((sum, goal) => sum + goal.currentAmount, 0) / goals.reduce((sum, goal) => sum + goal.targetAmount, 0)) * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Goals On Track</span>
+                        <span className="font-medium text-green-600">
+                          {goals.filter(goal => goal.status === 'on_track' || goal.status === 'ahead').length} of {goals.length}
+                        </span>
                       </div>
                     </div>
                   </div>
-                ))}
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-4">Monthly Contributions</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Total Monthly</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formatCurrency(goals.reduce((sum, goal) => sum + goal.monthlyContribution, 0))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Auto-investing</span>
+                        <span className="font-medium text-green-600">
+                          {goals.filter(goal => goal.autoInvest).length} goals
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {activeTab === 'planning' && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Financial Planning</h3>
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    Use our planning tools to optimize your goal strategy and maximize your returns.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors">
+                      <Calculator className="w-8 h-8 text-blue-500 mb-2" />
+                      <h4 className="font-medium text-gray-900 dark:text-white">Goal Calculator</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">Calculate required contributions</p>
+                    </button>
+                    <button className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors">
+                      <TrendingUp className="w-8 h-8 text-green-500 mb-2" />
+                      <h4 className="font-medium text-gray-900 dark:text-white">Return Projections</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">View future projections</p>
+                    </button>
+                    <button className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors">
+                      <BarChart3 className="w-8 h-8 text-purple-500 mb-2" />
+                      <h4 className="font-medium text-gray-900 dark:text-white">Portfolio Analysis</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">Analyze allocation</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'analytics' && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Goal Analytics</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-4">Goal Distribution</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">High Priority</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {goals.filter(goal => goal.priority === 'high').length} goals
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Medium Priority</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {goals.filter(goal => goal.priority === 'medium').length} goals
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Low Priority</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {goals.filter(goal => goal.priority === 'low').length} goals
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-4">Timeline Analysis</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Short-term (1-2 years)</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {goals.filter(goal => {
+                            const targetDate = new Date(goal.targetDate);
+                            const now = new Date();
+                            const diffYears = (targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365);
+                            return diffYears <= 2;
+                          }).length} goals
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Medium-term (3-5 years)</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {goals.filter(goal => {
+                            const targetDate = new Date(goal.targetDate);
+                            const now = new Date();
+                            const diffYears = (targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365);
+                            return diffYears > 2 && diffYears <= 5;
+                          }).length} goals
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Long-term (5+ years)</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {goals.filter(goal => {
+                            const targetDate = new Date(goal.targetDate);
+                            const now = new Date();
+                            const diffYears = (targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365);
+                            return diffYears > 5;
+                          }).length} goals
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

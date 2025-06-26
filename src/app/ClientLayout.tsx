@@ -1,7 +1,6 @@
 "use client";
 import TopNavBar from "@/components/TopNavBar";
 import BottomNavBar from "@/components/BottomNavBar";
-import { GeistProvider, CssBaseline } from '@geist-ui/react';
 import { PortfolioProvider } from '@/context/PortfolioContext';
 import { DividendsProvider } from '@/context/DividendsContext';
 import { ThemeProvider } from 'next-themes';
@@ -62,35 +61,32 @@ export default function ClientLayout({
         <UserSettingsProvider>
           <ToastProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <GeistProvider>
-                <CssBaseline />
-                <DividendsProvider>
-                  <PortfolioProvider>
-                    <WatchlistProvider>
-                      {/* Modern Top Navigation */}
-                      <TopNavBar />
-                      
-                      {/* Main Content Area - Full Width */}
-                      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16">
-                        {children}
-                      </main>
-                      
-                      {/* Mobile Bottom Navigation */}
-                      {isMobile && <BottomNavBar />}
-                      
-                      {/* Status Components */}
-                      <NetworkStatus />
-                      
-                      {/* Phase 3: Web App Polish Features - TEMPORARILY DISABLED */}
-                      {/* <KeyboardShortcuts /> */}
-                      {/* <DesktopOptimizations /> */}
-                      
-                      {/* PWA Installation */}
-                      {/* <WebAppEnhancements /> */}
-                    </WatchlistProvider>
-                  </PortfolioProvider>
-                </DividendsProvider>
-              </GeistProvider>
+              <DividendsProvider>
+                <PortfolioProvider>
+                  <WatchlistProvider>
+                    {/* Modern Top Navigation */}
+                    <TopNavBar />
+                    
+                    {/* Main Content Area - Full Width */}
+                    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16">
+                      {children}
+                    </main>
+                    
+                    {/* Mobile Bottom Navigation */}
+                    {isMobile && <BottomNavBar />}
+                    
+                    {/* Status Components */}
+                    <NetworkStatus />
+                    
+                    {/* Phase 3: Web App Polish Features - TEMPORARILY DISABLED */}
+                    {/* <KeyboardShortcuts /> */}
+                    {/* <DesktopOptimizations /> */}
+                    
+                    {/* PWA Installation */}
+                    {/* <WebAppEnhancements /> */}
+                  </WatchlistProvider>
+                </PortfolioProvider>
+              </DividendsProvider>
             </ThemeProvider>
           </ToastProvider>
         </UserSettingsProvider>

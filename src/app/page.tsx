@@ -6,6 +6,7 @@ import {
   Shield, Smartphone, TrendingUp, Users, Star
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ScreenshotPlaceholder from '@/components/ScreenshotPlaceholder';
 
 export default function HomePage() {
   const features = [
@@ -157,6 +158,69 @@ export default function HomePage() {
                 </Link>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Screenshot Showcase Section */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              See Divly in Action
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Get a glimpse of our powerful dashboard and tools designed to help you 
+              maximize your dividend portfolio performance.
+            </p>
+          </div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <ScreenshotPlaceholder 
+              label="Dashboard Overview" 
+              height={280}
+              className="hover:scale-105 transition-transform duration-300"
+            />
+            <ScreenshotPlaceholder 
+              label="Dividend Calendar" 
+              height={280}
+              className="hover:scale-105 transition-transform duration-300"
+            />
+            <ScreenshotPlaceholder 
+              label="Portfolio Insights" 
+              height={280}
+              className="hover:scale-105 transition-transform duration-300"
+            />
+            <ScreenshotPlaceholder 
+              label="News Intelligence" 
+              height={280}
+              className="hover:scale-105 transition-transform duration-300"
+            />
+            <ScreenshotPlaceholder 
+              label="Goal Planning" 
+              height={280}
+              className="hover:scale-105 transition-transform duration-300"
+            />
+            <ScreenshotPlaceholder 
+              label="Mobile Experience" 
+              height={280}
+              className="hover:scale-105 transition-transform duration-300"
+            />
+          </motion.div>
+          
+          <div className="text-center mt-12">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+            >
+              <span>Explore the Full Dashboard</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>

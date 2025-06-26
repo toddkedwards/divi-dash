@@ -9,23 +9,23 @@ import { useRealTimePrices } from '@/hooks/useRealTimePrices';
 
 export default function DashboardPage() {
   const { holdings } = usePortfolio();
-  const { priceUpdates } = useRealTimePrices(holdings.map(h => h.symbol));
+  const { priceUpdates } = useRealTimePrices(holdings);
 
   // Calculate portfolio totals
   const totalValue = holdings.reduce((sum, holding) => {
-    const currentPrice = priceUpdates[holding.symbol]?.currentPrice || holding.currentPrice;
+    const currentPrice = priceUpdates.find(p => p.symbol === holding.symbol)?.currentPrice || holding.currentPrice;
     return sum + (holding.shares * currentPrice);
   }, 0);
 
   // Calculate annual dividend income
   const totalDividends = holdings.reduce((sum, holding) => {
-    const currentPrice = priceUpdates[holding.symbol]?.currentPrice || holding.currentPrice;
+    const currentPrice = priceUpdates.find(p => p.symbol === holding.symbol)?.currentPrice || holding.currentPrice;
     const annualDividend = (currentPrice * holding.shares * (holding.dividendYield / 100));
     return sum + annualDividend;
   }, 0);
 
   const totalGainLoss = holdings.reduce((sum, holding) => {
-    const currentPrice = priceUpdates[holding.symbol]?.currentPrice || holding.currentPrice;
+    const currentPrice = priceUpdates.find(p => p.symbol === holding.symbol)?.currentPrice || holding.currentPrice;
     const currentValue = holding.shares * currentPrice;
     const costBasis = holding.costBasis;
     return sum + (currentValue - costBasis);

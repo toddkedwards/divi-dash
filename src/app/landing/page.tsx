@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, Calendar, BarChart, Smartphone, RefreshCw, Gem, DollarSign, Target, Eye, Star } from 'lucide-react';
 import GoProButton from '@/components/GoProButton';
+import ScreenshotPlaceholder from '@/components/ScreenshotPlaceholder';
 
 export default function LandingPage() {
   const [year, setYear] = useState<number | null>(null);
@@ -179,6 +180,19 @@ export default function LandingPage() {
             </ul>
             <GoProButton />
           </div>
+        </div>
+      </section>
+
+      {/* Screenshot Placeholder Grid */}
+      <section className="w-full max-w-4xl mb-20 mx-auto">
+        <h2 className="mb-6 text-primary text-center">App Screenshots</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <ScreenshotPlaceholder label="Dashboard Overview" />
+          <ScreenshotPlaceholder label="Dividend Calendar" />
+          <ScreenshotPlaceholder label="Portfolio Insights" />
+          <ScreenshotPlaceholder label="News Intelligence" />
+          <ScreenshotPlaceholder label="Goal Planning" />
+          <ScreenshotPlaceholder label="Mobile Experience" />
         </div>
       </section>
 

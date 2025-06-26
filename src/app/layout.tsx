@@ -2,7 +2,6 @@
 import "./globals.css";
 import TopNavBar from "@/components/TopNavBar";
 import BottomNavBar from "@/components/BottomNavBar";
-import { GeistProvider, CssBaseline } from '@geist-ui/react';
 import { PortfolioProvider } from '@/context/PortfolioContext';
 import { DividendsProvider } from '@/context/DividendsContext';
 import { ThemeProvider } from 'next-themes';
@@ -14,6 +13,8 @@ import { UserSettingsProvider } from '@/context/UserSettingsContext';
 import { AuthProvider } from '@/context/AuthContext';
 import React from 'react';
 import NetworkStatus from '@/components/NetworkStatus';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import OnboardingFlow from '@/components/OnboardingFlow';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
 }) {
   const [mounted, setMounted] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
+  const [showOnboarding, setShowOnboarding] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
@@ -33,29 +35,19 @@ export default function RootLayout({
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    
+    // Check if user needs onboarding
+    const hasSeenOnboarding = localStorage.getItem('divly-onboarding-completed');
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  if (!mounted) {
-    return (
-      <html lang="en" className="dark" suppressHydrationWarning>
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <meta name="theme-color" content="#000000" />
-          <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-          <meta name="apple-mobile-web-app-title" content="Divly" />
-          <link rel="apple-touch-icon" href="/icon-192x192.png" />
-          <link rel="manifest" href="/manifest.json" />
-        </head>
-        <body className="min-h-screen bg-gray-900">
-          <div className="flex min-h-screen items-center justify-center">
-            <div className="animate-pulse text-emerald-400">Loading Divly...</div>
-          </div>
-        </body>
-      </html>
-    );
-  }
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
@@ -66,6 +58,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Divly" />
         <meta name="description" content="Professional dividend portfolio tracking and analysis with AI-powered insights" />
+        <link rel="icon" href="/icon-192x192.png" type="image/png" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
@@ -75,25 +68,30 @@ export default function RootLayout({
             <UserSettingsProvider>
               <ToastProvider>
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
-                  <GeistProvider>
-                    <CssBaseline />
-                    <DividendsProvider>
-                      <PortfolioProvider>
-                        <WatchlistProvider>
+                  <DividendsProvider>
+                    <PortfolioProvider>
+                      <WatchlistProvider>
+                        <ErrorBoundary>
                           {/* Modern Top Navigation */}
                           <TopNavBar />
                           {/* Main Content Area - Full Width */}
                           <main className="min-h-screen bg-gray-900 pt-16">
                             {children}
                           </main>
-                          {/* Mobile Bottom Navigation */}
-                          {isMobile && <BottomNavBar />}
+                          {/* Mobile Bottom Navigation - Only render after hydration */}
+                          {mounted && isMobile && <BottomNavBar />}
                           {/* Status Components */}
                           <NetworkStatus />
-                        </WatchlistProvider>
-                      </PortfolioProvider>
-                    </DividendsProvider>
-                  </GeistProvider>
+                          {/* Onboarding Flow */}
+                          <OnboardingFlow 
+                            isOpen={showOnboarding}
+                            onClose={() => setShowOnboarding(false)}
+                            onComplete={handleOnboardingComplete}
+                          />
+                        </ErrorBoundary>
+                      </WatchlistProvider>
+                    </PortfolioProvider>
+                  </DividendsProvider>
                 </ThemeProvider>
               </ToastProvider>
             </UserSettingsProvider>

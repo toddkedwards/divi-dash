@@ -1,107 +1,119 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getStockQuote, getStockProfile } from '../utils/finnhub';
+import { stockDataService, StockQuote } from '@/utils/stockDataAPIs';
+import { Holding } from '@/data/holdings';
 
 interface PriceUpdate {
   symbol: string;
   currentPrice: number;
-  dailyChange: number;
-  dailyChangePercent: number;
-  dividendYield: number;
-  lastUpdate: number;
-  error?: string;
-  previousPrice?: number;
+  change: number;
+  changePercent: number;
+  lastUpdated: Date;
 }
 
-interface PriceUpdateState {
-  [key: string]: PriceUpdate;
-}
-
-export function useRealTimePrices(holdings: any[], interval = 30000) {
-  const [priceUpdates, setPriceUpdates] = useState<PriceUpdateState>({});
-  const [isUpdating, setIsUpdating] = useState(false);
+export function useRealTimePrices(holdings: Holding[], refreshInterval = 30000) {
+  const [priceUpdates, setPriceUpdates] = useState<PriceUpdate[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const MAX_RETRIES = 3;
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const updatePrices = useCallback(async () => {
-    if (!holdings.length) return;
-    setIsUpdating(true);
+    if (holdings.length === 0) return;
+
+    setIsLoading(true);
     setError(null);
-    
+
     try {
-      const updates = await Promise.all(
-        holdings.map(async (holding) => {
-          try {
-            const [quote, profile] = await Promise.all([
-              getStockQuote(holding.symbol),
-              getStockProfile(holding.symbol)
-            ]);
-
-            const previousPrice = priceUpdates[holding.symbol]?.currentPrice;
-            const currentPrice = quote.c;
-            
-            return {
-              symbol: holding.symbol,
-              currentPrice,
-              dailyChange: quote.d,
-              dailyChangePercent: quote.dp,
-              dividendYield: profile?.dividendYield ?? 0,
-              lastUpdate: Date.now(),
-              previousPrice,
-              error: undefined
-            };
-          } catch (error) {
-            console.error(`Error fetching price/profile for ${holding.symbol}:`, error);
-            return {
-              symbol: holding.symbol,
-              currentPrice: priceUpdates[holding.symbol]?.currentPrice ?? 0,
-              dailyChange: 0,
-              dailyChangePercent: 0,
-              dividendYield: 0,
-              lastUpdate: Date.now(),
-              error: `Failed to update ${holding.symbol}`
-            };
-          }
-        })
-      );
-
-      const updatesMap = updates.reduce((acc, update) => ({
-        ...acc,
-        [update.symbol]: update
-      }), {});
-
-      setPriceUpdates(updatesMap);
-      setRetryCount(0); // Reset retry count on successful update
-    } catch (error) {
-      console.error('Error updating prices:', error);
-      setError('Failed to update prices');
+      // Use the new stock data service with multiple providers
+      const quotes = await stockDataService.getPortfolioQuotes(holdings);
       
-      // Implement retry logic
-      if (retryCount < MAX_RETRIES) {
-        setRetryCount(prev => prev + 1);
-        setTimeout(updatePrices, 5000); // Retry after 5 seconds
-      }
+      const updates: PriceUpdate[] = quotes.map(quote => ({
+        symbol: quote.symbol,
+        currentPrice: quote.currentPrice,
+        change: quote.change,
+        changePercent: quote.changePercent,
+        lastUpdated: quote.lastUpdated
+      }));
+
+      setPriceUpdates(updates);
+      setLastUpdated(new Date());
+      
+      console.log(`Updated ${updates.length} stock prices`);
+    } catch (err) {
+      setError('Failed to update prices');
+      console.error('Price update error:', err);
     } finally {
-      setIsUpdating(false);
+      setIsLoading(false);
     }
-  }, [holdings, priceUpdates, retryCount]);
+  }, [holdings]);
 
+  // Initial price update
   useEffect(() => {
-    // Initial update
     updatePrices();
+  }, [updatePrices]);
 
-    // Set up interval for updates
-    const intervalId = setInterval(updatePrices, interval);
+  // Set up interval for periodic updates
+  useEffect(() => {
+    const interval = setInterval(updatePrices, refreshInterval);
+    return () => clearInterval(interval);
+  }, [updatePrices, refreshInterval]);
 
-    // Cleanup
-    return () => clearInterval(intervalId);
-  }, [updatePrices, interval]);
+  // Manual refresh function
+  const refreshPrices = useCallback(() => {
+    updatePrices();
+  }, [updatePrices]);
+
+  // Get current price for a specific symbol
+  const getCurrentPrice = useCallback((symbol: string): PriceUpdate | null => {
+    return priceUpdates.find(p => p.symbol === symbol) || null;
+  }, [priceUpdates]);
+
+  // Get all current prices
+  const getAllPrices = useCallback((): PriceUpdate[] => {
+    return priceUpdates;
+  }, [priceUpdates]);
+
+  // Calculate portfolio value with real-time prices
+  const getPortfolioValue = useCallback((): number => {
+    return holdings.reduce((total, holding) => {
+      const priceUpdate = priceUpdates.find(p => p.symbol === holding.symbol);
+      const currentPrice = priceUpdate?.currentPrice || holding.currentPrice;
+      return total + (holding.shares * currentPrice);
+    }, 0);
+  }, [holdings, priceUpdates]);
+
+  // Calculate total gain/loss
+  const getTotalGainLoss = useCallback((): { amount: number; percent: number } => {
+    let totalCost = 0;
+    let totalValue = 0;
+
+    holdings.forEach(holding => {
+      const priceUpdate = priceUpdates.find(p => p.symbol === holding.symbol);
+      const currentPrice = priceUpdate?.currentPrice || holding.currentPrice;
+      
+      totalCost += holding.shares * holding.avgPrice;
+      totalValue += holding.shares * currentPrice;
+    });
+
+    const amount = totalValue - totalCost;
+    const percent = totalCost > 0 ? (amount / totalCost) * 100 : 0;
+
+    return { amount, percent };
+  }, [holdings, priceUpdates]);
+
+  // Get available API providers
+  const getAvailableProviders = useCallback((): string[] => {
+    return stockDataService.getAvailableProviders();
+  }, []);
 
   return {
-    priceUpdates,
-    isUpdating,
+    priceUpdates: getAllPrices(),
+    getCurrentPrice,
+    getPortfolioValue,
+    getTotalGainLoss,
+    refreshPrices,
+    isLoading,
     error,
-    updatePrices,
-    retryCount
+    lastUpdated,
+    getAvailableProviders
   };
 } 
