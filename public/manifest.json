@@ -1,15 +1,58 @@
 {
-  "name": "Divi Dash - Dividend Portfolio Tracker",
-  "short_name": "Divi Dash",
-  "description": "Professional dividend portfolio tracking and analysis platform",
+  "name": "Divly - Smart Dividend Portfolio Tracker",
+  "short_name": "Divly",
+  "description": "Professional dividend portfolio tracking and analysis platform with AI-powered insights",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#059669",
   "orientation": "portrait-primary",
-  "categories": ["finance", "business", "investment"],
+  "categories": ["finance", "business", "investment", "productivity"],
   "lang": "en",
   "scope": "/",
+  "id": "divly-portfolio-tracker",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your portfolio dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Holdings",
+      "short_name": "Holdings",
+      "description": "View your portfolio positions",
+      "url": "/positions",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dividend Calendar",
+      "short_name": "Calendar",
+      "description": "View upcoming dividend payments",
+      "url": "/dividend-calendar",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "/icon-72x72.png",
@@ -60,24 +103,60 @@
       "purpose": "maskable any"
     }
   ],
-  "splash_pages": null,
+  "protocol_handlers": [
+    {
+      "protocol": "web+divly",
+      "url": "/?action=%s"
+    }
+  ],
   "features": [
     "Cross Platform",
     "Fast",
-    "Simple"
+    "Simple",
+    "AI-Powered",
+    "Real-time",
+    "Offline Support"
   ],
   "screenshots": [
     {
       "src": "/screenshot-wide.png",
       "sizes": "1280x720",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "Divly Dashboard - Wide View"
     },
     {
       "src": "/screenshot-narrow.png", 
       "sizes": "720x1280",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "Divly Mobile View"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "portfolio",
+          "accept": [".csv", ".xlsx", ".json"]
+        }
+      ]
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/import",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/json": [".json"],
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"]
+      }
     }
   ]
 } 

@@ -1,0 +1,244 @@
+"use client";
+
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { Keyboard, X } from 'lucide-react';
+
+interface KeyboardShortcut {
+  key: string;
+  description: string;
+  action: () => void;
+}
+
+export default function KeyboardShortcuts() {
+  const [showHelp, setShowHelp] = useState(false);
+  const router = useRouter();
+
+  // Memoize the shortcuts to prevent recreating on every render
+  const shortcuts: KeyboardShortcut[] = useMemo(() => [
+    {
+      key: 'Alt+D',
+      description: 'Go to Dashboard',
+      action: () => {
+        try {
+          router.push('/dashboard');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+P',
+      description: 'Go to Positions',
+      action: () => {
+        try {
+          router.push('/positions');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+C',
+      description: 'Go to Dividend Calendar',
+      action: () => {
+        try {
+          router.push('/dividend-calendar');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+S',
+      description: 'Go to Stock Screener',
+      action: () => {
+        try {
+          router.push('/stock-screener');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+G',
+      description: 'Go to Portfolio Goals',
+      action: () => {
+        try {
+          router.push('/portfolio-goals');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+I',
+      description: 'Go to Portfolio Insights',
+      action: () => {
+        try {
+          router.push('/portfolio-insights');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+A',
+      description: 'Go to AI Recommendations',
+      action: () => {
+        try {
+          router.push('/ai-recommendations');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+N',
+      description: 'Go to News Dashboard',
+      action: () => {
+        try {
+          router.push('/news-dashboard');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Alt+T',
+      description: 'Go to Settings',
+      action: () => {
+        try {
+          router.push('/settings');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: 'Ctrl+K',
+      description: 'Search Stocks',
+      action: () => {
+        try {
+          router.push('/stock-ticker-finder');
+        } catch (error) {
+          console.warn('Navigation error:', error);
+        }
+      }
+    },
+    {
+      key: '?',
+      description: 'Show/Hide Keyboard Shortcuts',
+      action: () => setShowHelp(prev => !prev)
+    },
+    {
+      key: 'Escape',
+      description: 'Close dialogs/Go back',
+      action: () => {
+        setShowHelp(false);
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      }
+    }
+  ], [router]);
+
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // Prevent shortcuts when typing in input fields
+    if (
+      event.target instanceof HTMLInputElement ||
+      event.target instanceof HTMLTextAreaElement ||
+      event.target instanceof HTMLSelectElement
+    ) {
+      return;
+    }
+
+    try {
+      const shortcut = shortcuts.find(s => {
+        if (s.key === '?') return event.key === '?';
+        if (s.key === 'Escape') return event.key === 'Escape';
+        if (s.key.startsWith('Alt+')) {
+          return event.altKey && event.key === s.key.split('+')[1].toLowerCase();
+        }
+        if (s.key.startsWith('Ctrl+')) {
+          return event.ctrlKey && event.key === s.key.split('+')[1].toLowerCase();
+        }
+        return false;
+      });
+
+      if (shortcut && typeof shortcut.action === 'function') {
+        event.preventDefault();
+        shortcut.action();
+      }
+    } catch (error) {
+      console.warn('Keyboard shortcut error:', error);
+    }
+  }, [shortcuts]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  return (
+    <>
+      {/* Keyboard Shortcuts Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <Keyboard className="h-6 w-6 text-emerald-600" />
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    Keyboard Shortcuts
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setShowHelp(false)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {shortcuts.map((shortcut, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                  >
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {shortcut.description}
+                    </span>
+                    <kbd className="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-sm font-mono text-gray-900 dark:text-white">
+                      {shortcut.key}
+                    </kbd>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                <p className="text-sm text-emerald-700 dark:text-emerald-400">
+                  <strong>Tip:</strong> Keyboard shortcuts are disabled when typing in input fields.
+                  Press <kbd className="px-1 py-0.5 bg-white dark:bg-gray-800 border rounded text-xs">?</kbd> to toggle this help panel.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Keyboard Icon */}
+      <button
+        onClick={() => setShowHelp(true)}
+        className="fixed bottom-4 right-4 p-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-40"
+        title="Keyboard Shortcuts (?)"
+      >
+        <Keyboard className="h-5 w-5" />
+      </button>
+    </>
+  );
+} 

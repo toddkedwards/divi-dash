@@ -388,7 +388,7 @@ export default function StockTickerFinderPage() {
   }
 
   return (
-    <main className="max-w-3xl mx-auto my-10 px-4 bg-white dark:bg-[#18181b] min-h-screen">
+    <main className="max-w-3xl mx-auto my-10 px-4 bg-white dark:bg-[#0a1629] min-h-screen">
       <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">Stock Ticker Finder</h1>
       <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-sm rounded-2xl p-8 mb-12 flex flex-col gap-8">
         <div className="mb-4 flex gap-2 items-center relative">

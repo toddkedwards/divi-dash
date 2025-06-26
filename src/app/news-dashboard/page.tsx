@@ -184,7 +184,7 @@ export default function NewsDashboardPage() {
                     <select
                       value={newAlert.type}
                       onChange={(e) => setNewAlert(prev => ({ ...prev, type: e.target.value as any }))}
-                      className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700"
+                      className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
                     >
                       <option value="keyword">Keyword</option>
                       <option value="symbol">Stock Symbol</option>
@@ -193,7 +193,7 @@ export default function NewsDashboardPage() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">
                       {newAlert.type === 'keyword' ? 'Keyword' : 
                        newAlert.type === 'symbol' ? 'Symbol' : 'Sentiment Threshold'}
                     </label>
@@ -201,11 +201,9 @@ export default function NewsDashboardPage() {
                       type="text"
                       value={newAlert.value}
                       onChange={(e) => setNewAlert(prev => ({ ...prev, value: e.target.value }))}
-                      placeholder={
-                        newAlert.type === 'keyword' ? 'e.g., dividend increase' :
-                        newAlert.type === 'symbol' ? 'e.g., AAPL' : 'e.g., -0.5'
-                      }
-                      className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700"
+                      placeholder={newAlert.type === 'keyword' ? 'e.g., dividend cut' : 
+                                  newAlert.type === 'symbol' ? 'e.g., AAPL' : 'e.g., 0.7'}
+                      className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
                     />
                   </div>
                   
@@ -375,36 +373,30 @@ export default function NewsDashboardPage() {
         </div>
 
         {/* Enhanced Tab Navigation */}
-        <div className="mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
           <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="-mb-px flex space-x-8">
-              {DASHBOARD_TABS.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                      activeTab === tab.id
-                        ? 'border-green-600 text-green-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <Icon className={`w-5 h-5 mr-2 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
-                      {tab.name}
-                    </div>
-                  </button>
-                );
-              })}
+            <nav className="-mb-px flex space-x-8 px-6">
+              {[
+                { id: 'overview', label: 'Market Intelligence', icon: Brain },
+                { id: 'dividends', label: 'Dividend Intelligence', icon: Shield },
+                { id: 'portfolio', label: 'Portfolio Intelligence', icon: Activity },
+                { id: 'alerts', label: 'Smart Alerts', icon: Zap }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200 rounded-t-lg
+                    ${activeTab === tab.id
+                      ? 'border-green-500 text-green-500 dark:text-green-400 dark:border-green-400 bg-gray-100 dark:bg-gray-900'
+                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-400 bg-transparent'}
+                  `}
+                  style={{ minWidth: 160 }}
+                >
+                  <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
             </nav>
-          </div>
-          
-          {/* Tab Description */}
-          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {DASHBOARD_TABS.find(tab => tab.id === activeTab)?.description}
-            </p>
           </div>
         </div>
 

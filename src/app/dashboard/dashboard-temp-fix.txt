@@ -1,0 +1,13 @@
+<PortfolioCompositionChart 
+  holdings={holdings.map(h => ({
+    ...h,
+    name: h.symbol,
+    marketValue: h.shares * h.currentPrice,
+    weight: ((h.shares * h.currentPrice) / totalPortfolioValue) * 100,
+    dayChange: 0,
+    dayChangePercent: 0,
+    marketCap: '10B',
+    country: 'US'
+  }))} 
+  totalValue={totalPortfolioValue} 
+/> 

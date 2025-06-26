@@ -64,13 +64,13 @@ export default function SettingsPage() {
 
         {/* Notification Preferences */}
         <section>
-          <h2 className="text-xl font-semibold mb-2">Notifications</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Notifications</h2>
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <input type="checkbox" checked={settings.notificationsEnabled} onChange={e => updateSetting('notificationsEnabled', e.target.checked)} />
               Enable browser notifications for dividends
             </label>
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <input type="checkbox" disabled />
               Email notifications (coming soon)
             </label>
@@ -78,37 +78,22 @@ export default function SettingsPage() {
         </section>
         {/* Default Views */}
         <section>
-          <h2 className="text-xl font-semibold mb-2">Default Views</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Default Views</h2>
           <div className="flex items-center gap-4">
-            <label>
+            <label className="text-gray-700 dark:text-gray-300">
               Dividend Calendar default:
-              <select className="ml-2 rounded border px-2 py-1" value={settings.calendarDefaultView} onChange={e => updateSetting('calendarDefaultView', e.target.value as 'month' | 'day')}>
+              <select className="ml-2 rounded border px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600" value={settings.calendarDefaultView} onChange={e => updateSetting('calendarDefaultView', e.target.value as 'month' | 'day')}>
                 <option value="month">Month View</option>
                 <option value="day">Day View</option>
               </select>
             </label>
-            <label>
+            <label className="text-gray-700 dark:text-gray-300">
               Default landing page:
-              <select className="ml-2 rounded border px-2 py-1" value={settings.landingPage} onChange={e => updateSetting('landingPage', e.target.value)}>
+              <select className="ml-2 rounded border px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600" value={settings.landingPage} onChange={e => updateSetting('landingPage', e.target.value)}>
                 <option value="dashboard">Dashboard</option>
                 <option value="positions">Portfolio</option>
                 <option value="dividend-calendar">Dividend Calendar</option>
               </select>
-            </label>
-          </div>
-        </section>
-        {/* Theme */}
-        <section>
-          <h2 className="text-xl font-semibold mb-2">Theme</h2>
-          <div className="flex items-center gap-4">
-            <label>
-              <input type="radio" name="theme" value="system" checked={settings.theme === 'system'} onChange={() => updateSetting('theme', 'system')} className="mr-2" /> System
-            </label>
-            <label>
-              <input type="radio" name="theme" value="light" checked={settings.theme === 'light'} onChange={() => updateSetting('theme', 'light')} className="mr-2" /> Light
-            </label>
-            <label>
-              <input type="radio" name="theme" value="dark" checked={settings.theme === 'dark'} onChange={() => updateSetting('theme', 'dark')} className="mr-2" /> Dark
             </label>
           </div>
         </section>

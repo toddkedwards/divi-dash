@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getStockQuote } from '../lib/finnhub';
-import { getStockProfile } from '../utils/finnhub';
+import { getStockQuote, getStockProfile } from '../utils/finnhub';
 
 interface PriceUpdate {
   symbol: string;

@@ -5,7 +5,6 @@ import { getHoldings, saveHolding } from '@/utils/holdingsLocal';
 import { useAuth } from './AuthContext';
 import { loadPortfolios, savePortfolios } from '@/lib/firestore';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useToast } from '@/components/ToastProvider';
 
 export interface Portfolio {
   id: string;
@@ -30,20 +29,47 @@ export interface PortfolioContextType {
   isProUser: boolean;
   syncing: boolean;
   syncError: string | null;
+  loading: boolean;
 }
 
-const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
+// Create default portfolio for initial state
+const defaultPortfolio: Portfolio = { 
+  id: 'default', 
+  name: 'My Portfolio', 
+  holdings: [] 
+};
+
+const defaultContextValue: PortfolioContextType = {
+  portfolios: [defaultPortfolio],
+  selectedPortfolioId: 'default',
+  selectPortfolio: () => {},
+  createPortfolio: () => {},
+  renamePortfolio: () => {},
+  deletePortfolio: () => {},
+  holdings: [],
+  addHolding: () => {},
+  removeHolding: () => {},
+  updateHolding: () => {},
+  editHolding: () => {},
+  deleteHolding: () => {},
+  refreshHoldings: () => {},
+  isProUser: false,
+  syncing: false,
+  syncError: null,
+  loading: true,
+};
+
+const PortfolioContext = createContext<PortfolioContextType>(defaultContextValue);
 
 export function PortfolioProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   // Placeholder for Pro check
   const isProUser = false; // TODO: Replace with real check
-  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
-  const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('');
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([defaultPortfolio]);
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('default');
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
-  const { toast } = useToast();
   const [wasSyncing, setWasSyncing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [pendingSync, setPendingSync] = useState(false);
@@ -91,77 +117,98 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       let loaded: Portfolio[] = [];
       let selectedId = '';
-      if (user && isProUser) {
-        // Cloud sync for Pro users
-        try {
-          setSyncing(true);
-          setSyncError(null);
-          const cloudPortfolios = await loadPortfolios();
-          if (cloudPortfolios && Array.isArray(cloudPortfolios) && cloudPortfolios.length > 0) {
-            loaded = cloudPortfolios;
-            selectedId = cloudPortfolios[0].id;
+      
+      try {
+        if (user && isProUser) {
+          // Cloud sync for Pro users
+          try {
+            setSyncing(true);
+            setSyncError(null);
+            const cloudPortfolios = await loadPortfolios();
+            if (cloudPortfolios && Array.isArray(cloudPortfolios) && cloudPortfolios.length > 0) {
+              loaded = cloudPortfolios;
+              selectedId = cloudPortfolios[0].id;
+            }
+          } catch (e: any) {
+            console.warn('Failed to load from cloud:', e);
+            setSyncError('Failed to load from cloud');
+          } finally {
+            setSyncing(false);
           }
-        } catch (e: any) {
-          setSyncError('Failed to load from cloud');
-        } finally {
-          setSyncing(false);
+        } else {
+          // Local storage for free users or when auth is not available
+          try {
+            const local = localStorage.getItem('portfolios');
+            loaded = local ? JSON.parse(local) : [];
+            selectedId = localStorage.getItem('selectedPortfolioId') || '';
+          } catch (e: any) {
+            console.warn('Failed to load from localStorage:', e);
+            loaded = [];
+            selectedId = '';
+          }
         }
-      } else {
-        const local = localStorage.getItem('portfolios');
-        loaded = local ? JSON.parse(local) : [];
-        selectedId = localStorage.getItem('selectedPortfolioId') || '';
+      } catch (error) {
+        console.error('Error loading portfolios:', error);
+        loaded = [];
+        selectedId = '';
       }
+      
       // Ensure at least one portfolio exists
       if (loaded.length === 0) {
-        const defaultPortfolio: Portfolio = { id: Math.random().toString(36).substr(2, 9), name: 'My Portfolio', holdings: [] };
+        const defaultPortfolio: Portfolio = { 
+          id: Math.random().toString(36).substr(2, 9), 
+          name: 'My Portfolio', 
+          holdings: [] 
+        };
         loaded = [defaultPortfolio];
         selectedId = defaultPortfolio.id;
       }
+      
       // Ensure a selected portfolio is set
       if (!selectedId && loaded.length > 0) {
         selectedId = loaded[0].id;
       }
+      
       setPortfolios(loaded);
       setSelectedPortfolioId(selectedId);
       setLoading(false);
     }
+    
     fetchPortfolios();
   }, [user, isProUser]);
 
   // Save portfolios to storage or Firestore
   useEffect(() => {
     if (loading) return;
-    if (user && isProUser) {
-      // Cloud sync for Pro users
-      (async () => {
+    
+    try {
+      if (user && isProUser) {
+        // Cloud sync for Pro users
+        (async () => {
+          try {
+            setSyncing(true);
+            setSyncError(null);
+            await savePortfolios(portfolios);
+          } catch (e: any) {
+            console.warn('Failed to sync to cloud:', e);
+            setSyncError('Failed to sync to cloud');
+          } finally {
+            setSyncing(false);
+          }
+        })();
+      } else {
+        // Local storage for free users or when auth is not available
         try {
-          setSyncing(true);
-          setSyncError(null);
-          await savePortfolios(portfolios);
+          localStorage.setItem('portfolios', JSON.stringify(portfolios));
+          localStorage.setItem('selectedPortfolioId', selectedPortfolioId);
         } catch (e: any) {
-          setSyncError('Failed to sync to cloud');
-        } finally {
-          setSyncing(false);
+          console.warn('Failed to save to localStorage:', e);
         }
-      })();
-    } else {
-      localStorage.setItem('portfolios', JSON.stringify(portfolios));
-      localStorage.setItem('selectedPortfolioId', selectedPortfolioId);
+      }
+    } catch (error) {
+      console.error('Error saving portfolios:', error);
     }
   }, [portfolios, selectedPortfolioId, user, isProUser, loading]);
-
-  // Toast notifications for sync events
-  useEffect(() => {
-    if (syncError) {
-      toast({ title: 'Sync Error', description: syncError, variant: 'destructive' });
-    }
-  }, [syncError, toast]);
-  useEffect(() => {
-    if (wasSyncing && !syncing && !syncError) {
-      toast({ title: 'Cloud Sync', description: 'Portfolio synced successfully!', variant: 'success' });
-    }
-    setWasSyncing(syncing);
-  }, [syncing, syncError, toast]);
 
   // Helper: get selected portfolio
   const selectedPortfolio = portfolios.find(p => p.id === selectedPortfolioId) || portfolios[0];
@@ -239,9 +286,8 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     isProUser,
     syncing,
     syncError,
-  }), [portfolios, selectedPortfolioId, holdings, isProUser, syncing, syncError]);
-
-  if (loading) return <LoadingSpinner size="md" />;
+    loading,
+  }), [portfolios, selectedPortfolioId, holdings, isProUser, syncing, syncError, loading]);
 
   return (
     <PortfolioContext.Provider value={contextValue}>
@@ -253,7 +299,8 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
 export function usePortfolio() {
   const context = useContext(PortfolioContext);
   if (context === undefined) {
-    throw new Error('usePortfolio must be used within a PortfolioProvider');
+    // Return default context value instead of throwing error
+    return defaultContextValue;
   }
   return context;
 } 

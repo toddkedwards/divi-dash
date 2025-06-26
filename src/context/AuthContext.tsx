@@ -14,7 +14,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {
+      setLoading(false);
+      return;
+    }
     
     // Check if auth is available before subscribing
     if (!auth) {
@@ -22,12 +25,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
     
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    // Check if auth is a mock object (for development)
+    if (typeof auth.onAuthStateChanged !== 'function') {
       setLoading(false);
-    });
+      return;
+    }
+    
+    try {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+        setLoading(false);
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } catch (error) {
+      console.warn('Auth state change error:', error);
+      setLoading(false);
+    }
   }, []);
 
   return (

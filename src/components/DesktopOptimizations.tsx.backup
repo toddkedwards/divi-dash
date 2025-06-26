@@ -1,0 +1,306 @@
+"use client";
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Monitor, Maximize2, Minimize2, Move, RotateCcw, Info } from 'lucide-react';
+
+interface DragState {
+  isDragging: boolean;
+  startX: number;
+  startY: number;
+  element: HTMLElement | null;
+}
+
+interface WindowState {
+  isMaximized: boolean;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+}
+
+export default function DesktopOptimizations() {
+  const [dragState, setDragState] = useState<DragState>({
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    element: null
+  });
+  
+  const [windowState, setWindowState] = useState<WindowState>({
+    isMaximized: false,
+    position: { x: 0, y: 0 },
+    size: { width: 400, height: 300 }
+  });
+
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; visible: boolean }>({
+    x: 0,
+    y: 0,
+    visible: false
+  });
+
+  // Detect desktop environment
+  useEffect(() => {
+    const checkDesktop = () => {
+      const hasPointer = window.matchMedia('(pointer: fine)').matches;
+      const hasHover = window.matchMedia('(hover: hover)').matches;
+      const isWideScreen = window.innerWidth >= 1024;
+      
+      setIsDesktop(hasPointer && hasHover && isWideScreen);
+    };
+
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
+
+  // Drag and drop functionality
+  const handleMouseDown = useCallback((e: React.MouseEvent, element: HTMLElement) => {
+    if (!isDesktop) return;
+    
+    setDragState({
+      isDragging: true,
+      startX: e.clientX - element.getBoundingClientRect().left,
+      startY: e.clientY - element.getBoundingClientRect().top,
+      element
+    });
+  }, [isDesktop]);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!dragState.isDragging || !dragState.element) return;
+
+    const newX = e.clientX - dragState.startX;
+    const newY = e.clientY - dragState.startY;
+
+    dragState.element.style.transform = `translate(${newX}px, ${newY}px)`;
+    setWindowState(prev => ({
+      ...prev,
+      position: { x: newX, y: newY }
+    }));
+  }, [dragState]);
+
+  const handleMouseUp = useCallback(() => {
+    setDragState(prev => ({
+      ...prev,
+      isDragging: false,
+      element: null
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (dragState.isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [dragState.isDragging, handleMouseMove, handleMouseUp]);
+
+  // Context menu functionality
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    if (!isDesktop) return;
+    
+    e.preventDefault();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      visible: true
+    });
+  }, [isDesktop]);
+
+  const hideContextMenu = useCallback(() => {
+    setContextMenu(prev => ({ ...prev, visible: false }));
+  }, []);
+
+  useEffect(() => {
+    if (contextMenu.visible) {
+      document.addEventListener('click', hideContextMenu);
+      return () => document.removeEventListener('click', hideContextMenu);
+    }
+  }, [contextMenu.visible, hideContextMenu]);
+
+  // Window controls
+  const toggleMaximize = () => {
+    setWindowState(prev => ({
+      ...prev,
+      isMaximized: !prev.isMaximized
+    }));
+  };
+
+  const resetPosition = () => {
+    setWindowState({
+      isMaximized: false,
+      position: { x: 0, y: 0 },
+      size: { width: 400, height: 300 }
+    });
+  };
+
+  // Keyboard shortcuts for desktop
+  useEffect(() => {
+    if (!isDesktop) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Alt + F4 to close modals (desktop convention)
+      if (e.altKey && e.key === 'F4') {
+        e.preventDefault();
+        // Close any open modals or go back
+        window.history.back();
+      }
+
+      // F11 for fullscreen toggle
+      if (e.key === 'F11') {
+        e.preventDefault();
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      }
+
+      // Ctrl + R for refresh
+      if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault();
+        window.location.reload();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isDesktop]);
+
+  if (!isDesktop) {
+    return null; // Don't render desktop optimizations on mobile
+  }
+
+  return (
+    <div className="desktop-optimizations">
+      {/* Draggable Demo Widget */}
+      <div 
+        className="fixed top-20 right-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg transition-shadow hover:shadow-xl z-30"
+        style={{
+          width: windowState.isMaximized ? '100%' : `${windowState.size.width}px`,
+          height: windowState.isMaximized ? '100%' : `${windowState.size.height}px`,
+          transform: windowState.isMaximized ? 'none' : `translate(${windowState.position.x}px, ${windowState.position.y}px)`,
+          cursor: dragState.isDragging ? 'grabbing' : 'default'
+        }}
+        onContextMenu={handleContextMenu}
+      >
+        {/* Window Title Bar */}
+        <div 
+          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-t-lg border-b border-gray-200 dark:border-gray-600 cursor-grab active:cursor-grabbing"
+          onMouseDown={(e) => handleMouseDown(e, e.currentTarget.parentElement as HTMLElement)}
+        >
+          <div className="flex items-center gap-2">
+            <Monitor className="h-4 w-4 text-emerald-600" />
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              Desktop Features
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <button
+              onClick={resetPosition}
+              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+              title="Reset Position"
+            >
+              <RotateCcw className="h-3 w-3" />
+            </button>
+            <button
+              onClick={toggleMaximize}
+              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+              title={windowState.isMaximized ? "Restore" : "Maximize"}
+            >
+              {windowState.isMaximized ? (
+                <Minimize2 className="h-3 w-3" />
+              ) : (
+                <Maximize2 className="h-3 w-3" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Widget Content */}
+        <div className="p-4">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm">
+              <Move className="h-4 w-4 text-blue-600" />
+              <span>Drag the title bar to move</span>
+            </div>
+            
+            <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+              <div>• Right-click for context menu</div>
+              <div>• F11 for fullscreen toggle</div>
+              <div>• Alt+F4 to go back</div>
+              <div>• Ctrl+R to refresh</div>
+            </div>
+
+            <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+              <div className="text-xs text-emerald-600 dark:text-emerald-400">
+                Desktop-optimized experience active
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div
+          className="fixed bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 z-50 min-w-[160px]"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y
+          }}
+        >
+          <button 
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            onClick={() => window.location.reload()}
+          >
+            <RotateCcw className="h-4 w-4" />
+            Refresh
+          </button>
+          <button 
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            onClick={() => window.print()}
+          >
+            <Monitor className="h-4 w-4" />
+            Print
+          </button>
+          <button 
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            onClick={() => navigator.share?.({ url: window.location.href })}
+          >
+            <Info className="h-4 w-4" />
+            Share Page
+          </button>
+          <hr className="my-1 border-gray-200 dark:border-gray-600" />
+          <button 
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+            onClick={() => alert('Desktop context menu demo')}
+          >
+            Desktop Menu Demo
+          </button>
+        </div>
+      )}
+
+      {/* Desktop Tooltip Enhancement */}
+      <style jsx>{`
+        .desktop-optimizations [title]:hover::after {
+          content: attr(title);
+          position: absolute;
+          background: rgba(0, 0, 0, 0.8);
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          white-space: nowrap;
+          z-index: 1000;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          margin-bottom: 4px;
+        }
+      `}</style>
+    </div>
+  );
+} 

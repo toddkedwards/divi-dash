@@ -377,26 +377,29 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
       </div>
 
       {/* Enhanced Tabs */}
-      <div className="border-b border-gray-200 dark:border-zinc-700">
-        <nav className="flex space-x-8">
-          {[
-            { id: 'presets', label: 'Preset Screens', icon: Filter },
-            { id: 'custom', label: 'Custom Screen', icon: Search }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'presets' | 'custom')}
-              className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === tab.id
-                  ? 'border-green-600 text-green-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-              }`}
-            >
-              <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex space-x-8 px-6">
+            {[
+              { id: 'presets', label: 'Preset Screens', icon: Filter },
+              { id: 'custom', label: 'Custom Screen', icon: Search }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as 'presets' | 'custom')}
+                className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200 rounded-t-lg
+                  ${activeTab === tab.id
+                    ? 'border-green-500 text-green-500 dark:text-green-400 dark:border-green-400 bg-gray-100 dark:bg-gray-900'
+                    : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-400 bg-transparent'}
+                `}
+                style={{ minWidth: 160 }}
+              >
+                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
       </div>
 
       {/* Preset Screens Tab */}

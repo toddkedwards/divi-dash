@@ -51,6 +51,7 @@ const navigationItems = [
   { name: 'Advanced Features', href: '/advanced-features', icon: <Zap size={20} />, group: 'smart' },
   { name: 'AI Recommendations', href: '/ai-recommendations', icon: <Brain size={20} />, group: 'smart' },
   { name: 'Community Hub', href: '/community', icon: <Users size={20} />, group: 'smart' },
+  { name: 'Business Dev', href: '/business-development', icon: <BarChart size={20} />, group: 'smart' },
 ];
 
 export default function Sidebar() {
@@ -141,41 +142,25 @@ export default function Sidebar() {
   const renderUserSection = () => (
     <div className="mt-auto w-full flex flex-col">
       {/* Border above this entire section */}
-      <div className="border-t border-green-400/30 pt-6 w-full flex flex-col gap-3 px-2">
-        
-        {/* Pro Upgrade */}
-        <Link href="/upgrade" className="flex items-center gap-3 px-4 py-3 rounded-lg text-yellow-400 bg-yellow-50/10 hover:bg-yellow-100/20 transition-colors duration-200 border border-yellow-400/20 hover:border-yellow-400/30">
-          <Gem size={18} className="text-yellow-400 flex-shrink-0" />
-          <span className="font-medium text-sm">Upgrade to Pro</span>
-        </Link>
-
-        {/* User Authentication */}
+      <div className="border-t border-white/20 pt-4 w-full">
+        {/* User avatar and info */}
         {user ? (
-          <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10">
-            {user.photoURL ? (
-              <Image
+          <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10 mb-3">
+            {user.photoURL && (
+              <img
                 src={user.photoURL}
-                alt={user.displayName || 'User'}
-                width={28}
-                height={28}
-                className="rounded-full flex-shrink-0"
+                alt="User avatar"
+                className="w-8 h-8 rounded-full flex-shrink-0"
               />
-            ) : (
-              <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4" />
-              </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-white">{user.displayName || 'User'}</p>
-              <p className="text-xs text-green-200 truncate">{user.email}</p>
+              <p className="text-sm font-medium text-white truncate">
+                {user.displayName || 'User'}
+              </p>
+              <p className="text-xs text-white/70 truncate">
+                {user.email}
+              </p>
             </div>
-            <button
-              onClick={() => auth.signOut()}
-              className="p-2 rounded-lg hover:bg-white/10 text-white transition-colors flex-shrink-0"
-              title="Sign out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
         ) : (
           <button
@@ -187,13 +172,12 @@ export default function Sidebar() {
           </button>
         )}
 
-        {/* Settings and Theme Toggle */}
+        {/* Settings */}
         <div className="flex flex-col gap-3">
           <Link href="/settings" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all duration-200 border border-white/20 hover:border-white/30">
             <Settings size={18} className="flex-shrink-0" />
             <span className="font-medium text-sm">Settings</span>
           </Link>
-          {renderThemeToggle()}
         </div>
       </div>
     </div>
@@ -216,13 +200,6 @@ export default function Sidebar() {
       <aside className="flex flex-col w-64 h-screen bg-gradient-to-b from-green-600 to-green-700 dark:from-green-700 dark:to-green-800">
         <div className="p-6 flex flex-col h-full">
           <div className="flex items-center gap-3 mb-10 pl-4">
-            <Image
-              src="/divly-logo.svg"
-              alt="Divly Logo"
-              width={40}
-              height={40}
-              className="flex-shrink-0 -mt-1"
-            />
             <h1 className="text-3xl font-extrabold tracking-tight text-white">Divly</h1>
           </div>
           {renderNavItems()}
@@ -242,13 +219,6 @@ export default function Sidebar() {
           >
             <div className="w-64 h-full text-soft-white shadow-lg flex flex-col p-6 bg-gradient-to-b from-green-600 to-green-700 dark:from-green-700 dark:to-green-800">
               <div className="flex items-center gap-3 mb-10 pl-4">
-                <Image
-                  src="/divly-logo.svg"
-                  alt="Divly Logo"
-                  width={40}
-                  height={40}
-                  className="flex-shrink-0 -mt-1"
-                />
                 <h1 className="text-3xl font-extrabold tracking-tight text-white">Divly</h1>
               </div>
               {renderNavItems()}

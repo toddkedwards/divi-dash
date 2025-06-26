@@ -26,7 +26,7 @@ export default function LandingPage() {
     <main>
       {/* Hero Section */}
       <section className="w-full max-w-3xl text-center mb-16 mx-auto">
-        <h1 className="mb-4">Divly</h1>
+        <h1 className="mb-4 text-gray-900 dark:text-white">Divly</h1>
         <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-200 mb-8">
           Track your portfolio, dividends, and financial goals with real-time data, beautiful charts, and powerful tools—all in one place.
         </p>

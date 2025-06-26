@@ -151,7 +151,7 @@ const IntegrationAutomationPage: React.FC = () => {
 
         {/* Tabs */}
         <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="flex space-x-8">
+          <nav className="-mb-px flex space-x-8 px-6">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'real-api', label: 'Real API Setup', icon: Shield },
@@ -163,14 +163,15 @@ const IntegrationAutomationPage: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setSelectedTab(tab.id as any)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                    selectedTab === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                  }`}
+                  className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200 rounded-t-lg
+                    ${selectedTab === tab.id
+                      ? 'border-green-500 text-green-500 dark:text-green-400 dark:border-green-400 bg-gray-100 dark:bg-gray-900'
+                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-400 bg-transparent'}
+                  `}
+                  style={{ minWidth: 160 }}
                 >
-                  <Icon className="h-4 w-4" />
-                  {tab.label}
+                  <Icon className={`w-5 h-5 ${selectedTab === tab.id ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                  <span>{tab.label}</span>
                 </button>
               );
             })}

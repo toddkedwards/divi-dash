@@ -1,11 +1,19 @@
+"use client";
 import React, { useEffect, useState } from 'react';
 import { useToast } from './ToastProvider';
 
 export default function NetworkStatus() {
+  const [mounted, setMounted] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const handleOnline = () => {
       setIsOnline(true);
       toast({
@@ -36,7 +44,11 @@ export default function NetworkStatus() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [toast]);
+  }, [mounted, toast]);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div 

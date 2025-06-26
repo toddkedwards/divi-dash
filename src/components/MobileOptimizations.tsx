@@ -136,7 +136,7 @@ export default function MobileOptimizations({
               <span className="text-green-600 font-bold text-sm">D</span>
             </div>
             <div>
-              <p className="text-sm font-medium">Install Divi Dash</p>
+              <p className="text-sm font-medium">Install Divly</p>
               <p className="text-xs opacity-90">Add to home screen for quick access</p>
             </div>
           </div>

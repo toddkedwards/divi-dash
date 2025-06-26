@@ -136,31 +136,31 @@ export default function PortfolioGoalsPage() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'border-red-200 bg-red-50';
-      case 'medium': return 'border-yellow-200 bg-yellow-50';
-      case 'low': return 'border-green-200 bg-green-50';
-      default: return 'border-gray-200 bg-gray-50';
+      case 'high': return 'border-red-200 bg-red-50 dark:border-red-700 dark:bg-gray-900';
+      case 'medium': return 'border-yellow-200 bg-yellow-50 dark:border-yellow-700 dark:bg-gray-900';
+      case 'low': return 'border-green-200 bg-green-50 dark:border-green-700 dark:bg-gray-900';
+      default: return 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900';
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 text-purple-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading portfolio goals...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading portfolio goals...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Portfolio Goals</h1>
-            <p className="text-gray-600">Set, track, and achieve your financial objectives</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Portfolio Goals</h1>
+            <p className="text-gray-600 dark:text-gray-300">Set, track, and achieve your financial objectives</p>
           </div>
           
           <div className="flex items-center space-x-3">
@@ -169,73 +169,73 @@ export default function PortfolioGoalsPage() {
               <span>New Goal</span>
             </button>
             
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <button className="p-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
               <Download className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <button className="p-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
               <Share2 className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <button className="p-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
               <Settings className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Total Goal Value</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Goal Value</h3>
               <Target className="w-5 h-5 text-blue-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(goals.reduce((sum, goal) => sum + goal.targetAmount, 0))}
             </div>
-            <div className="text-sm text-gray-500 mt-1">
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Across {goals.length} goals
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Current Progress</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Current Progress</h3>
               <PieChart className="w-5 h-5 text-green-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(goals.reduce((sum, goal) => sum + goal.currentAmount, 0))}
             </div>
-            <div className="text-sm text-green-600 mt-1">
+            <div className="text-sm text-green-600 dark:text-green-400 mt-1">
               {((goals.reduce((sum, goal) => sum + goal.currentAmount, 0) / goals.reduce((sum, goal) => sum + goal.targetAmount, 0)) * 100).toFixed(1)}% complete
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Monthly Contributions</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Monthly Contributions</h3>
               <Calendar className="w-5 h-5 text-green-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(goals.reduce((sum, goal) => sum + goal.monthlyContribution, 0))}
             </div>
-            <div className="text-sm text-purple-600 mt-1">
+            <div className="text-sm text-purple-600 dark:text-purple-400 mt-1">
               Auto-invested
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Goals On Track</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Goals On Track</h3>
               <CheckCircle className="w-5 h-5 text-indigo-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {goals.filter(goal => goal.status === 'on_track' || goal.status === 'ahead').length}
             </div>
-            <div className="text-sm text-indigo-600 mt-1">
+            <div className="text-sm text-indigo-600 dark:text-indigo-400 mt-1">
               of {goals.length} goals
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
           <div className="p-6">
             <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -243,12 +243,12 @@ export default function PortfolioGoalsPage() {
                   <div key={goal.id} className={`border-2 rounded-lg p-6 ${getPriorityColor(goal.priority)}`}>
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                        <div className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                           <goal.icon className="w-6 h-6 text-blue-500" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{goal.title}</h3>
-                          <p className="text-sm text-gray-600">{goal.description}</p>
+                          <h3 className="font-semibold text-gray-900 dark:text-white">{goal.title}</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{goal.description}</p>
                         </div>
                       </div>
                       
@@ -257,7 +257,7 @@ export default function PortfolioGoalsPage() {
                           {getStatusIcon(goal.status)}
                           <span className="capitalize">{goal.status.replace('_', ' ')}</span>
                         </span>
-                        <button className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+                        <button className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
                           <Edit3 className="w-4 h-4" />
                         </button>
                       </div>
@@ -266,38 +266,38 @@ export default function PortfolioGoalsPage() {
                     <div className="space-y-4">
                       <div>
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm text-gray-600">Progress</span>
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm text-gray-600 dark:text-gray-300">Progress</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                           <div 
                             className="h-3 bg-blue-500 rounded-full transition-all duration-300"
                             style={{ width: `${Math.min(getGoalProgress(goal), 100)}%` }}
                           ></div>
                         </div>
                         <div className="flex justify-between items-center mt-1">
-                          <span className="text-xs text-gray-500">{getGoalProgress(goal).toFixed(1)}% complete</span>
-                          <span className="text-xs text-gray-500">{getTimeToGoal(goal)} remaining</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{getGoalProgress(goal).toFixed(1)}% complete</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{getTimeToGoal(goal)} remaining</span>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <div className="text-gray-600">Monthly Contribution</div>
-                          <div className="font-medium text-gray-900">{formatCurrency(goal.monthlyContribution)}</div>
+                          <div className="text-gray-600 dark:text-gray-300">Monthly Contribution</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{formatCurrency(goal.monthlyContribution)}</div>
                         </div>
                         <div>
-                          <div className="text-gray-600">Expected Return</div>
-                          <div className="font-medium text-gray-900">{goal.expectedReturn.toFixed(1)}%</div>
+                          <div className="text-gray-600 dark:text-gray-300">Expected Return</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{goal.expectedReturn.toFixed(1)}%</div>
                         </div>
                         <div>
-                          <div className="text-gray-600">Target Date</div>
-                          <div className="font-medium text-gray-900">{new Date(goal.targetDate).toLocaleDateString()}</div>
+                          <div className="text-gray-600 dark:text-gray-300">Target Date</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{new Date(goal.targetDate).toLocaleDateString()}</div>
                         </div>
                         <div>
-                          <div className="text-gray-600">Priority</div>
+                          <div className="text-gray-600 dark:text-gray-300">Priority</div>
                           <div className={`font-medium capitalize ${
                             goal.priority === 'high' ? 'text-red-600' :
                             goal.priority === 'medium' ? 'text-yellow-600' :
@@ -308,7 +308,7 @@ export default function PortfolioGoalsPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div className="flex items-center space-x-2 text-sm">
                           {goal.autoInvest && (
                             <span className="flex items-center text-green-600">
@@ -317,7 +317,7 @@ export default function PortfolioGoalsPage() {
                             </span>
                           )}
                         </div>
-                        <button className="text-sm text-purple-600 hover:text-purple-700 transition-colors flex items-center space-x-1">
+                        <button className="text-sm px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white transition-colors flex items-center space-x-1 shadow">
                           <span>View Details</span>
                           <ChevronRight className="w-3 h-3" />
                         </button>

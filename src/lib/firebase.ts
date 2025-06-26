@@ -21,14 +21,42 @@ try {
   if (process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'demo-api-key') {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     auth = getAuth(app);
-  } else if (typeof window !== 'undefined') {
-    // Only show warning in browser, not during build
-    console.warn('Firebase not initialized: Missing valid API key');
+  } else {
+    // Create a mock auth object for development
+    if (typeof window !== 'undefined') {
+      console.warn('Firebase not initialized: Missing valid API key - using mock auth');
+      auth = {
+        currentUser: null,
+        onAuthStateChanged: (callback: any) => {
+          callback(null);
+          return () => {};
+        }
+      };
+    }
   }
 } catch (error) {
   if (typeof window !== 'undefined') {
     console.error('Firebase initialization error:', error);
+    // Create a mock auth object as fallback
+    auth = {
+      currentUser: null,
+      onAuthStateChanged: (callback: any) => {
+        callback(null);
+        return () => {};
+      }
+    };
   }
+}
+
+// Ensure auth is always available
+if (!auth && typeof window !== 'undefined') {
+  auth = {
+    currentUser: null,
+    onAuthStateChanged: (callback: any) => {
+      callback(null);
+      return () => {};
+    }
+  };
 }
 
 // Export auth with null check
@@ -39,7 +67,7 @@ export const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
 
 export async function getFcmToken() {
   if (typeof window === 'undefined') return null;
-  if (!(await isSupported())) return null;
+  if (!app || !(await isSupported())) return null;
   
   try {
     const messaging = getMessaging(app);

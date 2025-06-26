@@ -56,30 +56,30 @@ export default function PortfolioInsightsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 text-purple-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading portfolio insights...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading portfolio insights...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Portfolio Insights</h1>
-            <p className="text-gray-600">Advanced analytics and insights for your dividend portfolio</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Portfolio Insights</h1>
+            <p className="text-gray-600 dark:text-gray-300">Advanced analytics and insights for your dividend portfolio</p>
           </div>
           
           <div className="flex items-center space-x-3">
             <select
               value={timeframe}
               onChange={(e) => setTimeframe(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="1M">1 Month</option>
               <option value="3M">3 Months</option>
@@ -89,13 +89,13 @@ export default function PortfolioInsightsPage() {
               <option value="ALL">All Time</option>
             </select>
             
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <button className="p-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
               <Download className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <button className="p-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
               <Share2 className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <button className="p-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white transition-colors">
               <Settings className="w-5 h-5" />
             </button>
           </div>
@@ -103,47 +103,47 @@ export default function PortfolioInsightsPage() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Total Value</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Value</h3>
               <DollarSign className="w-5 h-5 text-green-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(487650)}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(487650)}</div>
             <div className="flex items-center text-sm mt-1">
               <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
               <span className="text-green-600">{formatPercent(16.05)}</span>
-              <span className="text-gray-500 ml-1">({formatCurrency(67420)})</span>
+              <span className="text-gray-500 dark:text-gray-400 ml-1">({formatCurrency(67420)})</span>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Annual Dividend Income</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Annual Dividend Income</h3>
               <Percent className="w-5 h-5 text-green-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(18450)}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(18450)}</div>
             <div className="flex items-center text-sm mt-1">
               <span className="text-purple-600 font-medium">3.78% yield</span>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Annualized Return</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Annualized Return</h3>
               <TrendingUp className="w-5 h-5 text-blue-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{formatPercent(12.34)}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatPercent(12.34)}</div>
             <div className="flex items-center text-sm mt-1">
               <span className="text-blue-600 font-medium">Sharpe: 1.18</span>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-600">Diversification Score</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Diversification Score</h3>
               <Shield className="w-5 h-5 text-indigo-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">85/100</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">85/100</div>
             <div className="flex items-center text-sm mt-1">
               <span className="text-indigo-600 font-medium">Well Diversified</span>
             </div>
@@ -151,8 +151,8 @@ export default function PortfolioInsightsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-          <div className="border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
+          <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-8 px-6">
               {[
                 { id: 'overview', label: 'Overview', icon: BarChart3 },
@@ -164,13 +164,14 @@ export default function PortfolioInsightsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? 'border-green-600 text-green-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200 rounded-t-lg
+                    ${activeTab === tab.id
+                      ? 'border-green-500 text-green-500 dark:text-green-400 dark:border-green-400 bg-gray-100 dark:bg-gray-900'
+                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-400 bg-transparent'}
+                  `}
+                  style={{ minWidth: 160 }}
                 >
-                  <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-green-600' : ''}`} />
+                  <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`} />
                   <span>{tab.label}</span>
                 </button>
               ))}
@@ -182,65 +183,65 @@ export default function PortfolioInsightsPage() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Performance Metrics</h3>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Total Return</span>
-                        <span className="font-medium">{formatPercent(16.05)}</span>
+                        <span className="text-gray-600 dark:text-gray-300">Total Return</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatPercent(16.05)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Annualized Return</span>
-                        <span className="font-medium">{formatPercent(12.34)}</span>
+                        <span className="text-gray-600 dark:text-gray-300">Annualized Return</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatPercent(12.34)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Volatility</span>
-                        <span className="font-medium">14.2%</span>
+                        <span className="text-gray-600 dark:text-gray-300">Volatility</span>
+                        <span className="font-medium text-gray-900 dark:text-white">14.2%</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Sharpe Ratio</span>
-                        <span className="font-medium">1.18</span>
+                        <span className="text-gray-600 dark:text-gray-300">Sharpe Ratio</span>
+                        <span className="font-medium text-gray-900 dark:text-white">1.18</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Maximum Drawdown</span>
-                        <span className="font-medium text-red-600">-8.5%</span>
+                        <span className="text-gray-600 dark:text-gray-300">Max Drawdown</span>
+                        <span className="font-medium text-gray-900 dark:text-white">-8.4%</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Beta</span>
-                        <span className="font-medium">0.92</span>
+                        <span className="text-gray-600 dark:text-gray-300">Beta</span>
+                        <span className="font-medium text-gray-900 dark:text-white">0.92</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Alpha</span>
+                        <span className="text-gray-600 dark:text-gray-300">Alpha</span>
                         <span className="font-medium text-green-600">+2.1%</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Dividend Analysis</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Dividend Analysis</h3>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Current Yield</span>
-                        <span className="font-medium">3.78%</span>
+                        <span className="text-gray-600 dark:text-gray-300">Current Yield</span>
+                        <span className="font-medium text-gray-900 dark:text-white">3.78%</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Annual Income</span>
-                        <span className="font-medium">{formatCurrency(18450)}</span>
+                        <span className="text-gray-600 dark:text-gray-300">Annual Income</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(18450)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Monthly Income</span>
-                        <span className="font-medium">{formatCurrency(1537)}</span>
+                        <span className="text-gray-600 dark:text-gray-300">Monthly Income</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(1537)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Dividend Growth (1Y)</span>
+                        <span className="text-gray-600 dark:text-gray-300">Dividend Growth (1Y)</span>
                         <span className="font-medium text-green-600">+8.2%</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Avg Payout Ratio</span>
-                        <span className="font-medium">45.8%</span>
+                        <span className="text-gray-600 dark:text-gray-300">Avg Payout Ratio</span>
+                        <span className="font-medium text-gray-900 dark:text-white">45.8%</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Dividend Aristocrats</span>
-                        <span className="font-medium">12 holdings</span>
+                        <span className="text-gray-600 dark:text-gray-300">Dividend Aristocrats</span>
+                        <span className="font-medium text-gray-900 dark:text-white">12 holdings</span>
                       </div>
                     </div>
                   </div>
@@ -377,17 +378,14 @@ export default function PortfolioInsightsPage() {
                         { sector: 'Financials', value: 48920, weight: 10.0, holdings: 4, avgYield: 3.42, icon: Banknote },
                         { sector: 'Real Estate', value: 42150, weight: 8.6, holdings: 3, avgYield: 4.65, icon: Home }
                       ].map((sector) => (
-                        <div key={sector.sector} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={sector.sector} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                           <div className="flex items-center space-x-3">
                             <sector.icon className="w-5 h-5 text-blue-500" />
-                            <div>
-                              <div className="font-medium text-gray-900">{sector.sector}</div>
-                              <div className="text-sm text-gray-500">{sector.holdings} holdings</div>
-                            </div>
+                            <span className="font-medium text-gray-900 dark:text-white">{sector.sector}</span>
                           </div>
                           <div className="text-right">
-                            <div className="font-medium text-gray-900">{formatCurrency(sector.value)}</div>
-                            <div className="text-sm text-gray-500">{sector.weight.toFixed(1)}%</div>
+                            <div className="font-medium text-gray-900 dark:text-white">{formatCurrency(sector.value)}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{sector.weight.toFixed(1)}%</div>
                           </div>
                         </div>
                       ))}
@@ -461,23 +459,23 @@ export default function PortfolioInsightsPage() {
                       recommendation: 'Strong dividend coverage with average payout ratio of 45%'
                     }
                   ].map((metric, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-6">
+                    <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium text-gray-900">{metric.name}</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-white">{metric.name}</h4>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          metric.score === 'Low' ? 'text-green-600 bg-green-100' :
-                          metric.score === 'Medium' ? 'text-yellow-600 bg-yellow-100' :
-                          'text-red-600 bg-red-100'
+                          metric.score === 'Low' ? 'text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-300' :
+                          metric.score === 'Medium' ? 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300' :
+                          'text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-300'
                         }`}>
                           {metric.score} Risk
                         </span>
                       </div>
-                      <div className="text-2xl font-bold text-gray-900 mb-2">
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                         {metric.value.toFixed(1)}%
                       </div>
-                      <p className="text-gray-600 text-sm mb-3">{metric.description}</p>
-                      <div className="bg-white rounded p-3 border-l-4 border-blue-400">
-                        <p className="text-sm text-gray-700">{metric.recommendation}</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">{metric.description}</p>
+                      <div className="bg-white dark:bg-gray-800 rounded p-3 border-l-4 border-blue-400">
+                        <p className="text-sm text-gray-700 dark:text-gray-300">{metric.recommendation}</p>
                       </div>
                     </div>
                   ))}
@@ -536,10 +534,10 @@ export default function PortfolioInsightsPage() {
                     }
                   ].map((insight, index) => (
                     <div key={index} className={`border rounded-lg p-6 ${
-                      insight.type === 'opportunity' ? 'bg-yellow-50 border-yellow-200' :
-                      insight.type === 'warning' ? 'bg-red-50 border-red-200' :
-                      insight.type === 'achievement' ? 'bg-green-50 border-green-200' :
-                      'bg-blue-50 border-blue-200'
+                      insight.type === 'opportunity' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700' :
+                      insight.type === 'warning' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700' :
+                      insight.type === 'achievement' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' :
+                      'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'
                     }`}>
                       <div className="flex items-start space-x-4">
                         <div className="flex-shrink-0">
@@ -550,23 +548,23 @@ export default function PortfolioInsightsPage() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-medium text-gray-900">{insight.title}</h4>
+                            <h4 className="font-medium text-gray-900 dark:text-white">{insight.title}</h4>
                             <div className="flex items-center space-x-2">
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                insight.impact === 'High' ? 'bg-red-100 text-red-800' :
-                                insight.impact === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-green-100 text-green-800'
+                                insight.impact === 'High' ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200' :
+                                insight.impact === 'Medium' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' :
+                                'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
                               }`}>
                                 {insight.impact} Impact
                               </span>
-                              <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium capitalize">
+                              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs font-medium capitalize">
                                 {insight.category}
                               </span>
                             </div>
                           </div>
-                          <p className="text-gray-700 mb-3">{insight.description}</p>
+                          <p className="text-gray-700 dark:text-gray-300 mb-3">{insight.description}</p>
                           {insight.actionable && (
-                            <button className="text-sm bg-white px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
+                            <button className="text-sm bg-white dark:bg-gray-800 px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300">
                               Take Action
                             </button>
                           )}

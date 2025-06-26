@@ -154,14 +154,14 @@ export default function AdvancedFeaturesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Advanced Features</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Advanced Features</h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
                 Professional-grade portfolio analysis and management tools
               </p>
             </div>
@@ -181,20 +181,20 @@ export default function AdvancedFeaturesPage() {
           {/* Stats Overview */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat) => (
-              <div key={stat.label} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div key={stat.label} className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <stat.icon className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <stat.icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">{stat.label}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{stat.label}</p>
                     <div className="flex items-center space-x-2">
-                      <p className="text-lg font-bold text-gray-900">{stat.value}</p>
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">{stat.value}</p>
                       {stat.change && (
                         <span className={`text-xs ${
                           stat.positive === true ? 'text-green-600' :
                           stat.positive === false ? 'text-red-600' :
-                          'text-gray-500'
+                          'text-gray-500 dark:text-gray-400'
                         }`}>
                           {stat.change}
                         </span>
@@ -210,37 +210,37 @@ export default function AdvancedFeaturesPage() {
 
       {/* Feature Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Choose Your Analysis Tool</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Choose Your Analysis Tool</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {features.map((feature) => (
               <button
                 key={feature.id}
                 onClick={() => setActiveFeature(feature.id as any)}
-                className={`text-left p-4 rounded-lg border-2 transition-all ${
-                  activeFeature === feature.id
-                    ? `border-${feature.color}-500 bg-${feature.color}-50`
-                    : 'border-gray-200 hover:border-gray-300 bg-white'
-                }`}
+                className={`text-left p-4 rounded-lg border-2 transition-all 
+                  ${activeFeature === feature.id
+                    ? `border-${feature.color}-500 bg-${feature.color}-50 dark:bg-${feature.color}-900/30 dark:border-${feature.color}-400`
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-900'}
+                `}
               >
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className={`p-2 rounded-lg ${
-                    activeFeature === feature.id
+                  <div className={`p-2 rounded-lg 
+                    ${activeFeature === feature.id
                       ? `bg-${feature.color}-500 text-white`
-                      : `bg-${feature.color}-100 text-${feature.color}-600`
-                  }`}>
+                      : `bg-${feature.color}-100 dark:bg-${feature.color}-900/30 text-${feature.color}-600 dark:text-${feature.color}-400`}
+                  `}>
                     <feature.icon className="w-5 h-5" />
                   </div>
-                  <h3 className={`font-medium ${
-                    activeFeature === feature.id ? `text-${feature.color}-900` : 'text-gray-900'
-                  }`}>
+                  <h3 className={`font-medium 
+                    ${activeFeature === feature.id ? `text-${feature.color}-900 dark:text-${feature.color}-200` : 'text-gray-900 dark:text-white'}
+                  `}>
                     {feature.title}
                   </h3>
                 </div>
-                <p className={`text-sm ${
-                  activeFeature === feature.id ? `text-${feature.color}-700` : 'text-gray-600'
-                }`}>
+                <p className={`text-sm 
+                  ${activeFeature === feature.id ? `text-${feature.color}-700 dark:text-${feature.color}-300` : 'text-gray-600 dark:text-gray-300'}
+                `}>
                   {feature.description}
                 </p>
               </button>
@@ -260,9 +260,9 @@ export default function AdvancedFeaturesPage() {
 
           {activeFeature === 'alerts' && (
             <div className="w-full">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Alert Management</h3>
-                <p className="text-gray-600 mb-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Alert Management</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Configure and monitor portfolio alerts to stay informed about important changes.
                 </p>
                 <button 
@@ -290,8 +290,8 @@ export default function AdvancedFeaturesPage() {
         </div>
 
         {/* Feature Benefits */}
-        <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-          <h3 className="text-lg font-medium text-blue-900 mb-4">Why Advanced Features Matter</h3>
+        <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg p-6 border border-blue-200 dark:border-blue-700">
+          <h3 className="text-lg font-medium text-blue-900 dark:text-blue-200 mb-4">Why Advanced Features Matter</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-start space-x-3">
@@ -299,8 +299,8 @@ export default function AdvancedFeaturesPage() {
                 <Brain className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="font-medium text-blue-900">Smart Insights</h4>
-                <p className="text-sm text-blue-700 mt-1">
+                <h4 className="font-medium text-blue-900 dark:text-blue-200">Smart Insights</h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                   AI-powered analysis identifies opportunities and risks you might miss
                 </p>
               </div>
@@ -311,8 +311,8 @@ export default function AdvancedFeaturesPage() {
                 <Target className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="font-medium text-blue-900">Precision Targeting</h4>
-                <p className="text-sm text-blue-700 mt-1">
+                <h4 className="font-medium text-blue-900 dark:text-blue-200">Precision Targeting</h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                   Focus on what matters most with customizable alerts and filters
                 </p>
               </div>
@@ -323,8 +323,8 @@ export default function AdvancedFeaturesPage() {
                 <Zap className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="font-medium text-blue-900">Real-time Action</h4>
-                <p className="text-sm text-blue-700 mt-1">
+                <h4 className="font-medium text-blue-900 dark:text-blue-200">Real-time Action</h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                   Stay ahead of market movements with instant notifications
                 </p>
               </div>
@@ -334,13 +334,13 @@ export default function AdvancedFeaturesPage() {
 
         {/* Quick Actions */}
         <div className="mt-6 flex flex-wrap gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             Export Analysis
           </button>
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             Schedule Report
           </button>
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             Share Insights
           </button>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
