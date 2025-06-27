@@ -26,7 +26,8 @@ import {
   Download,
   Users,
   Calendar,
-  Bookmark
+  Bookmark,
+  Percent
 } from 'lucide-react';
 import RecommendationsService, {
   StockRecommendation,
@@ -175,6 +176,13 @@ export default function AIRecommendationsPage() {
     return filtered;
   };
 
+  const tabs = [
+    { id: 'recommendations' as const, name: 'Stock Recommendations', icon: TrendingUp },
+    { id: 'dividends' as const, name: 'Dividend Predictions', icon: Percent },
+    { id: 'optimization' as const, name: 'Portfolio Optimization', icon: Target },
+    { id: 'insights' as const, name: 'AI Insights', icon: Brain }
+  ];
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 flex items-center justify-center">
@@ -198,94 +206,86 @@ export default function AIRecommendationsPage() {
           <div className="py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
-                  <Brain className="w-8 h-8 text-white" />
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                  <Brain className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Recommendations</h1>
-                  <p className="text-gray-600 dark:text-gray-300 mt-1">
-                    Advanced machine learning insights for your investment portfolio
-                  </p>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">AI Recommendations</h1>
+                  <p className="text-gray-600 dark:text-gray-400">AI-powered insights and recommendations</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                {profile && (
-                  <div className="text-sm text-gray-600 dark:text-gray-300 text-right">
-                    <p>Risk Tolerance: <span className="font-medium capitalize">{profile.riskTolerance}</span></p>
-                    <p>Portfolio: {formatCurrency(profile.portfolioSize)}</p>
-                  </div>
-                )}
-                <button
-                  onClick={loadData}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  <span>Refresh</span>
-                </button>
-              </div>
+              <button
+                onClick={loadData}
+                disabled={isLoading}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
             </div>
-            {/* Market Sentiment Banner */}
-            {marketSentiment && (
-              <div className={`mt-6 p-4 rounded-lg border ${getSentimentColor(marketSentiment.overall)} dark:bg-gray-900 dark:border-gray-700`}> 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Eye className="w-5 h-5" />
-                    <div>
-                      <span className="font-semibold">Market Sentiment: {marketSentiment.overall.toUpperCase()}</span>
-                      <span className="ml-2">({marketSentiment.score > 0 ? '+' : ''}{marketSentiment.score.toFixed(1)})</span>
-                      <div className="text-sm mt-1">
-                        {marketSentiment.keyFactors.slice(0, 2).map((factor, i) => (
-                          <span key={i} className="mr-4">• {factor}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm">Confidence: {marketSentiment.confidence.toFixed(0)}%</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      Trend: {marketSentiment.trends.shortTerm} (short), {marketSentiment.trends.longTerm} (long)
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="-mb-px flex space-x-8 px-6">
-            {[
-              { id: 'recommendations', label: 'Stock Recommendations', icon: Star, count: recommendations.length },
-              { id: 'dividends', label: 'Dividend Predictions', icon: DollarSign, count: dividendPredictions.length },
-              { id: 'optimization', label: 'Portfolio Optimization', icon: BarChart3, count: optimizations.length },
-              { id: 'insights', label: 'AI Insights', icon: Lightbulb, count: insights.length }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200 rounded-t-lg
-                  ${activeTab === tab.id
-                    ? 'border-green-500 text-green-500 dark:text-green-400 dark:border-green-400 bg-gray-100 dark:bg-gray-900'
-                    : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-400 bg-transparent'}
-                `}
-                style={{ minWidth: 160 }}
-              >
-                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`} />
-                <span>{tab.label}</span>
-                <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 py-0.5 px-2 rounded-full text-xs">
-                  {tab.count}
-                </span>
-              </button>
-            ))}
-          </nav>
-        </div>
-      </div>
-
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-[#181C23] rounded-xl p-6 flex flex-col justify-between border border-[#232834] shadow">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-base text-gray-400 font-medium">Total Value</span>
+              <DollarSign className="w-5 h-5 text-green-400" />
+            </div>
+            <div className="text-3xl font-bold text-white">$487,650</div>
+            <div className="text-sm text-green-400 mt-2">+16.05% ($67,420)</div>
+          </div>
+          <div className="bg-[#181C23] rounded-xl p-6 flex flex-col justify-between border border-[#232834] shadow">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-base text-gray-400 font-medium">Annual Dividend Income</span>
+              <Percent className="w-5 h-5 text-green-400" />
+            </div>
+            <div className="text-3xl font-bold text-white">$18,450</div>
+            <div className="text-sm text-purple-400 mt-2">3.78% yield</div>
+          </div>
+          <div className="bg-[#181C23] rounded-xl p-6 flex flex-col justify-between border border-[#232834] shadow">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-base text-gray-400 font-medium">Annualized Return</span>
+              <TrendingUp className="w-5 h-5 text-blue-400" />
+            </div>
+            <div className="text-3xl font-bold text-white">+12.34%</div>
+            <div className="text-sm text-blue-400 mt-2">Sharpe: 1.18</div>
+          </div>
+          <div className="bg-[#181C23] rounded-xl p-6 flex flex-col justify-between border border-[#232834] shadow">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-base text-gray-400 font-medium">Diversification Score</span>
+              <Shield className="w-5 h-5 text-purple-400" />
+            </div>
+            <div className="text-3xl font-bold text-white">85/100</div>
+            <div className="text-sm text-purple-400 mt-2">Well Diversified</div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="flex space-x-2 mb-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center px-6 py-3 rounded-full font-medium text-base transition-colors focus:outline-none ${
+                    activeTab === tab.id
+                      ? 'bg-[#232834] text-green-400 shadow border border-green-400'
+                      : 'bg-transparent text-gray-400 hover:text-green-300'
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5 mr-2" />
+                  {tab.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {activeTab === 'recommendations' && (
           <div className="space-y-6">
             {/* Filters */}

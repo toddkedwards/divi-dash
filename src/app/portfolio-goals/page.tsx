@@ -32,6 +32,8 @@ import {
 export default function PortfolioGoalsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('goals');
+  const [selectedGoal, setSelectedGoal] = useState<any>(null);
+  const [showGoalModal, setShowGoalModal] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1000);
@@ -140,6 +142,26 @@ export default function PortfolioGoalsPage() {
       case 'medium': return 'border-yellow-200 bg-yellow-50 dark:border-yellow-700 dark:bg-gray-900';
       case 'low': return 'border-green-200 bg-green-50 dark:border-green-700 dark:bg-gray-900';
       default: return 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900';
+    }
+  };
+
+  const handleViewDetails = (goal: any) => {
+    setSelectedGoal(goal);
+    setShowGoalModal(true);
+  };
+
+  const handlePlanningAction = (action: string) => {
+    // Handle planning button clicks
+    switch (action) {
+      case 'calculator':
+        alert('Goal Calculator: Calculate required monthly contributions based on target amount, timeline, and expected returns.');
+        break;
+      case 'projections':
+        alert('Return Projections: View future portfolio value projections based on current contributions and market assumptions.');
+        break;
+      case 'analysis':
+        alert('Portfolio Analysis: Analyze current allocation and get recommendations for goal optimization.');
+        break;
     }
   };
 
@@ -344,7 +366,10 @@ export default function PortfolioGoalsPage() {
                               </span>
                             )}
                           </div>
-                          <button className="text-sm px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white transition-colors flex items-center space-x-1 shadow">
+                          <button 
+                            onClick={() => handleViewDetails(goal)}
+                            className="text-sm px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white transition-colors flex items-center space-x-1 shadow"
+                          >
                             <span>View Details</span>
                             <ChevronRight className="w-3 h-3" />
                           </button>
@@ -359,27 +384,75 @@ export default function PortfolioGoalsPage() {
             {activeTab === 'progress' && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Progress Overview</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-4">Overall Progress</h4>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 dark:text-gray-300">Total Progress</span>
-                        <span className="font-medium text-gray-900 dark:text-white">
+                
+                {/* Overall Progress Chart */}
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-4">Overall Portfolio Progress</h4>
+                  <div className="relative pt-1">
+                    <div className="flex mb-2 items-center justify-between">
+                      <div>
+                        <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">
+                          Progress
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-semibold inline-block text-green-600">
                           {((goals.reduce((sum, goal) => sum + goal.currentAmount, 0) / goals.reduce((sum, goal) => sum + goal.targetAmount, 0)) * 100).toFixed(1)}%
                         </span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 dark:text-gray-300">Goals On Track</span>
-                        <span className="font-medium text-green-600">
-                          {goals.filter(goal => goal.status === 'on_track' || goal.status === 'ahead').length} of {goals.length}
-                        </span>
+                    </div>
+                    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
+                      <div 
+                        style={{ width: `${(goals.reduce((sum, goal) => sum + goal.currentAmount, 0) / goals.reduce((sum, goal) => sum + goal.targetAmount, 0)) * 100}%` }}
+                        className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-4">Goal Status</h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-300">On Track</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-green-600">
+                            {goals.filter(goal => goal.status === 'on_track' || goal.status === 'ahead').length}
+                          </span>
+                          <div className="w-16 h-2 bg-green-200 rounded-full">
+                            <div className="w-12 h-2 bg-green-500 rounded-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-300">Behind Schedule</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-red-600">
+                            {goals.filter(goal => goal.status === 'behind').length}
+                          </span>
+                          <div className="w-16 h-2 bg-red-200 rounded-full">
+                            <div className="w-4 h-2 bg-red-500 rounded-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-300">Completed</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-purple-600">
+                            {goals.filter(goal => goal.status === 'completed').length}
+                          </span>
+                          <div className="w-16 h-2 bg-purple-200 rounded-full">
+                            <div className="w-0 h-2 bg-purple-500 rounded-full"></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
                     <h4 className="font-medium text-gray-900 dark:text-white mb-4">Monthly Contributions</h4>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 dark:text-gray-300">Total Monthly</span>
                         <span className="font-medium text-gray-900 dark:text-white">
@@ -392,7 +465,44 @@ export default function PortfolioGoalsPage() {
                           {goals.filter(goal => goal.autoInvest).length} goals
                         </span>
                       </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Expected Annual Growth</span>
+                        <span className="font-medium text-blue-600">
+                          {formatCurrency(goals.reduce((sum, goal) => sum + (goal.monthlyContribution * 12 * (1 + goal.expectedReturn / 100)), 0))}
+                        </span>
+                      </div>
                     </div>
+                  </div>
+                </div>
+
+                {/* Individual Goal Progress */}
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-4">Individual Goal Progress</h4>
+                  <div className="space-y-4">
+                    {goals.map((goal) => (
+                      <div key={goal.id} className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-gray-900 dark:text-white">{goal.title}</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-300">
+                            {getGoalProgress(goal).toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="h-2 bg-blue-500 rounded-full transition-all duration-300"
+                            style={{ width: `${Math.min(getGoalProgress(goal), 100)}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between items-center mt-2 text-sm">
+                          <span className="text-gray-600 dark:text-gray-300">
+                            {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
+                          </span>
+                          <span className="text-gray-600 dark:text-gray-300">
+                            {getTimeToGoal(goal)} remaining
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -406,17 +516,26 @@ export default function PortfolioGoalsPage() {
                     Use our planning tools to optimize your goal strategy and maximize your returns.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors">
+                    <button 
+                      onClick={() => handlePlanningAction('calculator')}
+                      className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors"
+                    >
                       <Calculator className="w-8 h-8 text-blue-500 mb-2" />
                       <h4 className="font-medium text-gray-900 dark:text-white">Goal Calculator</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">Calculate required contributions</p>
                     </button>
-                    <button className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors">
+                    <button 
+                      onClick={() => handlePlanningAction('projections')}
+                      className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors"
+                    >
                       <TrendingUp className="w-8 h-8 text-green-500 mb-2" />
                       <h4 className="font-medium text-gray-900 dark:text-white">Return Projections</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">View future projections</p>
                     </button>
-                    <button className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors">
+                    <button 
+                      onClick={() => handlePlanningAction('analysis')}
+                      className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-400 transition-colors"
+                    >
                       <BarChart3 className="w-8 h-8 text-purple-500 mb-2" />
                       <h4 className="font-medium text-gray-900 dark:text-white">Portfolio Analysis</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">Analyze allocation</p>
@@ -497,6 +616,151 @@ export default function PortfolioGoalsPage() {
           </div>
         </div>
       </div>
+
+      {/* Goal Details Modal */}
+      {showGoalModal && selectedGoal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{selectedGoal.title}</h2>
+                <button 
+                  onClick={() => setShowGoalModal(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Description</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{selectedGoal.description}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Progress</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-600 dark:text-gray-300">Current Amount</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(selectedGoal.currentAmount)}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-600 dark:text-gray-300">Target Amount</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(selectedGoal.targetAmount)}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2">
+                          <div 
+                            className="h-3 bg-blue-500 rounded-full transition-all duration-300"
+                            style={{ width: `${Math.min(getGoalProgress(selectedGoal), 100)}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {getGoalProgress(selectedGoal).toFixed(1)}% Complete
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Timeline</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Target Date</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {new Date(selectedGoal.targetDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Time Remaining</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{getTimeToGoal(selectedGoal)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Status</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedGoal.status)}`}>
+                          {selectedGoal.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Priority</span>
+                        <span className={`font-medium capitalize ${
+                          selectedGoal.priority === 'high' ? 'text-red-600' :
+                          selectedGoal.priority === 'medium' ? 'text-yellow-600' :
+                          'text-green-600'
+                        }`}>
+                          {selectedGoal.priority}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contributions</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Monthly Contribution</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(selectedGoal.monthlyContribution)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Expected Return</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{selectedGoal.expectedReturn.toFixed(1)}%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Auto-investing</span>
+                        <span className={`font-medium ${selectedGoal.autoInvest ? 'text-green-600' : 'text-red-600'}`}>
+                          {selectedGoal.autoInvest ? 'Enabled' : 'Disabled'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Projections</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Annual Contribution</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(selectedGoal.monthlyContribution * 12)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Expected Growth</span>
+                        <span className="font-medium text-blue-600">
+                          {formatCurrency(selectedGoal.monthlyContribution * 12 * (selectedGoal.expectedReturn / 100))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 dark:text-gray-300">Remaining to Target</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formatCurrency(selectedGoal.targetAmount - selectedGoal.currentAmount)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <button 
+                    onClick={() => setShowGoalModal(false)}
+                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Edit Goal
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

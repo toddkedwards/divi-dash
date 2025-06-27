@@ -11,7 +11,9 @@ import {
   Brain,
   Target,
   Activity,
-  RefreshCw
+  RefreshCw,
+  DollarSign,
+  Percent
 } from 'lucide-react';
 import AdvancedAnalyticsDashboard from '../../components/AdvancedAnalyticsDashboard';
 import AlertsPanel from '../../components/AlertsPanel';
@@ -100,21 +102,21 @@ export default function AdvancedFeaturesPage() {
 
   const features = [
     {
-      id: 'analytics',
+      id: 'analytics' as const,
       title: 'Advanced Analytics',
       description: 'Deep portfolio analysis with risk metrics, performance attribution, and predictive insights',
       icon: BarChart3,
       color: 'blue'
     },
     {
-      id: 'alerts',
+      id: 'alerts' as const,
       title: 'Smart Alerts',
       description: 'Intelligent notifications for price changes, dividend announcements, and portfolio events',
       icon: Bell,
       color: 'yellow'
     },
     {
-      id: 'composition',
+      id: 'composition' as const,
       title: 'Portfolio Composition',
       description: 'Interactive visualizations showing asset allocation across sectors, geography, and market cap',
       icon: PieChart,
@@ -209,42 +211,26 @@ export default function AdvancedFeaturesPage() {
       </div>
 
       {/* Feature Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Choose Your Analysis Tool</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {features.map((feature) => (
-              <button
-                key={feature.id}
-                onClick={() => setActiveFeature(feature.id as any)}
-                className={`text-left p-4 rounded-lg border-2 transition-all 
-                  ${activeFeature === feature.id
-                    ? `border-${feature.color}-500 bg-${feature.color}-50 dark:bg-${feature.color}-900/30 dark:border-${feature.color}-400`
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-900'}
-                `}
-              >
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className={`p-2 rounded-lg 
-                    ${activeFeature === feature.id
-                      ? `bg-${feature.color}-500 text-white`
-                      : `bg-${feature.color}-100 dark:bg-${feature.color}-900/30 text-${feature.color}-600 dark:text-${feature.color}-400`}
-                  `}>
-                    <feature.icon className="w-5 h-5" />
-                  </div>
-                  <h3 className={`font-medium 
-                    ${activeFeature === feature.id ? `text-${feature.color}-900 dark:text-${feature.color}-200` : 'text-gray-900 dark:text-white'}
-                  `}>
-                    {feature.title}
-                  </h3>
-                </div>
-                <p className={`text-sm 
-                  ${activeFeature === feature.id ? `text-${feature.color}-700 dark:text-${feature.color}-300` : 'text-gray-600 dark:text-gray-300'}
-                `}>
-                  {feature.description}
-                </p>
-              </button>
-            ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tabs */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="flex space-x-2 mb-8">
+              {features.map((feature) => (
+                <button
+                  key={feature.id}
+                  onClick={() => setActiveFeature(feature.id)}
+                  className={`flex items-center px-6 py-3 rounded-full font-medium text-base transition-colors focus:outline-none ${
+                    activeFeature === feature.id
+                      ? 'bg-[#232834] text-green-400 shadow border border-green-400'
+                      : 'bg-transparent text-gray-400 hover:text-green-300'
+                  }`}
+                >
+                  <feature.icon className="w-5 h-5 mr-2" />
+                  {feature.title}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

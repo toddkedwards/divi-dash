@@ -25,6 +25,9 @@ export default function DividendCalendarPage() {
   const [showPaymentDates, setShowPaymentDates] = useState(true);
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [view, setView] = useState<'month' | 'week' | 'day'>('month');
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'paid'>('all');
 
   // Calculate upcoming dividends based on frequency and historical data
   const calculateUpcomingDividends = useCallback(() => {
@@ -147,6 +150,136 @@ export default function DividendCalendarPage() {
   ];
 
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() + i);
+
+  // Mock dividend events data
+  const dividendEvents = [
+    {
+      id: '1',
+      symbol: 'AAPL',
+      company: 'Apple Inc.',
+      amount: 0.24,
+      exDate: '2024-01-15',
+      payDate: '2024-02-15',
+      shares: 50,
+      totalAmount: 12.00,
+      status: 'upcoming',
+      type: 'quarterly'
+    },
+    {
+      id: '2',
+      symbol: 'MSFT',
+      company: 'Microsoft Corporation',
+      amount: 0.75,
+      exDate: '2024-01-20',
+      payDate: '2024-02-20',
+      shares: 30,
+      totalAmount: 22.50,
+      status: 'upcoming',
+      type: 'quarterly'
+    },
+    {
+      id: '3',
+      symbol: 'JNJ',
+      company: 'Johnson & Johnson',
+      amount: 1.19,
+      exDate: '2024-01-25',
+      payDate: '2024-02-25',
+      shares: 75,
+      totalAmount: 89.25,
+      status: 'upcoming',
+      type: 'quarterly'
+    },
+    {
+      id: '4',
+      symbol: 'KO',
+      company: 'The Coca-Cola Company',
+      amount: 0.46,
+      exDate: '2024-01-30',
+      payDate: '2024-02-28',
+      shares: 100,
+      totalAmount: 46.00,
+      status: 'upcoming',
+      type: 'quarterly'
+    },
+    {
+      id: '5',
+      symbol: 'VZ',
+      company: 'Verizon Communications',
+      amount: 0.665,
+      exDate: '2024-02-05',
+      payDate: '2024-03-05',
+      shares: 60,
+      totalAmount: 39.90,
+      status: 'upcoming',
+      type: 'quarterly'
+    },
+    {
+      id: '6',
+      symbol: 'T',
+      company: 'AT&T Inc.',
+      amount: 0.2775,
+      exDate: '2024-02-10',
+      payDate: '2024-03-10',
+      shares: 80,
+      totalAmount: 22.20,
+      status: 'upcoming',
+      type: 'quarterly'
+    },
+    {
+      id: '7',
+      symbol: 'PG',
+      company: 'Procter & Gamble',
+      amount: 0.9407,
+      exDate: '2024-02-15',
+      payDate: '2024-03-15',
+      shares: 40,
+      totalAmount: 37.63,
+      status: 'upcoming',
+      type: 'quarterly'
+    },
+    {
+      id: '8',
+      symbol: 'JPM',
+      company: 'JPMorgan Chase & Co.',
+      amount: 1.05,
+      exDate: '2024-02-20',
+      payDate: '2024-03-20',
+      shares: 25,
+      totalAmount: 26.25,
+      status: 'upcoming',
+      type: 'quarterly'
+    }
+  ];
+
+  const getEventsForDate = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return dividendEvents.filter(event => {
+      const eventDate = new Date(event.exDate);
+      return eventDate.toDateString() === date.toDateString();
+    });
+  };
+
+  // Generate calendar days for the selected month
+  const generateCalendarDays = () => {
+    const year = selectedYear;
+    const month = selectedMonth;
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const days = [];
+    const currentDate = new Date(startDate);
+    
+    while (currentDate <= lastDay || currentDate.getDay() !== 0) {
+      days.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return days;
+  };
+
+  const calendarDays = generateCalendarDays();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -296,58 +429,61 @@ export default function DividendCalendarPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Per Share</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Yield</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {filteredPayouts.map((payout, index) => (
-                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {formatDate(payout.date)}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {payout.date.toLocaleDateString()}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {payout.symbol}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {payout.shares.toLocaleString()} shares
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          payout.type === 'ex-date' 
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-                            : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                        }`}>
-                          {payout.type === 'ex-date' ? 'Ex-Date' : 'Payment'}
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                {/* Day Headers */}
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="bg-gray-50 dark:bg-gray-800 p-3 text-center">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{day}</span>
+                  </div>
+                ))}
+                
+                {/* Calendar Days */}
+                {calendarDays.map((day, index) => {
+                  const isCurrentMonth = day.getMonth() === selectedMonth;
+                  const isToday = day.toDateString() === new Date().toDateString();
+                  const dayEvents = getEventsForDate(day);
+                  
+                  return (
+                    <div
+                      key={index}
+                      className={`min-h-[120px] p-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 ${
+                        !isCurrentMonth ? 'text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white'
+                      } ${isToday ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700' : ''}`}
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <span className={`text-sm font-medium ${isToday ? 'text-blue-600 dark:text-blue-400' : ''}`}>
+                          {day.getDate()}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {formatCurrency(payout.amount)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {formatCurrency(payout.totalAmount)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {payout.yield.toFixed(2)}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        {dayEvents.length > 0 && (
+                          <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-1 rounded">
+                            {dayEvents.length}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Event Indicators */}
+                      <div className="space-y-1">
+                        {dayEvents.slice(0, 2).map((event) => (
+                          <div
+                            key={event.id}
+                            className="text-xs p-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
+                            title={`${event.symbol}: $${event.amount} per share`}
+                          >
+                            <div className="font-medium">{event.symbol}</div>
+                            <div className="text-xs">${event.amount}</div>
+                          </div>
+                        ))}
+                        {dayEvents.length > 2 && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                            +{dayEvents.length - 2} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
