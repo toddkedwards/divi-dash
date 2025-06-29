@@ -19,6 +19,7 @@ import CommunityService, {
 
 interface CommunityHubProps {
   className?: string;
+  onError?: (error: string | null) => void;
 }
 
 const getIconComponent = (iconName: string) => {
@@ -49,7 +50,7 @@ const getColorClasses = (color: string) => {
   return colorMap[color] || colorMap.blue;
 };
 
-export default function CommunityHub({ className = '' }: CommunityHubProps) {
+export default function CommunityHub({ className = '', onError }: CommunityHubProps) {
   const [activeTab, setActiveTab] = useState<'feed' | 'challenges' | 'leaderboard' | 'groups' | 'profile'>('feed');
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [challenges, setChallenges] = useState<CommunityChallenge[]>([]);
@@ -98,6 +99,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
       setTrendingTags(tagsData);
     } catch (error) {
       console.error('Failed to load community data:', error);
+      onError?.(error instanceof Error ? error.message : null);
     } finally {
       setIsLoading(false);
     }
@@ -114,6 +116,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
       ));
     } catch (error) {
       console.error('Failed to like post:', error);
+      onError?.(error instanceof Error ? error.message : null);
     }
   };
 
@@ -136,6 +139,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
       ));
     } catch (error) {
       console.error('Failed to join challenge:', error);
+      onError?.(error instanceof Error ? error.message : null);
     }
   };
 
@@ -150,6 +154,7 @@ export default function CommunityHub({ className = '' }: CommunityHubProps) {
       ));
     } catch (error) {
       console.error('Failed to follow user:', error);
+      onError?.(error instanceof Error ? error.message : null);
     }
   };
 

@@ -818,6 +818,96 @@ export default function HoldingsTable({ holdings, onEdit, onDelete, onRefresh, o
           +
         </button>
       )}
+      
+      {/* News Popover */}
+      {newsPopover && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Latest News for {newsPopover.symbol}
+              </h3>
+              <button
+                onClick={handleCloseNews}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              {newsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <LoadingSpinner size="md" />
+                </div>
+              ) : newsData[newsPopover.symbol] && newsData[newsPopover.symbol].length > 0 ? (
+                <div className="space-y-4">
+                  {newsData[newsPopover.symbol].slice(0, 10).map((news, index) => (
+                    <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                        <a
+                          href={news.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-blue-600 dark:hover:text-blue-400"
+                        >
+                          {news.headline}
+                        </a>
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        {news.summary}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
+                        <span>{news.source}</span>
+                        <span>{new Date(news.datetime * 1000).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  No news available for {newsPopover.symbol}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dividend History Popover */}
+      {dividendPopover && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Dividend History for {dividendPopover.symbol}
+              </h3>
+              <button
+                onClick={handleCloseDividend}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <DollarSign className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <p className="text-lg font-medium mb-2">Dividend History</p>
+                <p className="text-sm">
+                  Dividend history data for {dividendPopover.symbol} will be available soon.
+                </p>
+                <p className="text-xs mt-2">
+                  This feature is currently in development and will show historical dividend payments, 
+                  ex-dividend dates, and payment dates.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -1,12 +1,25 @@
 "use client";
 import { motion } from 'framer-motion';
-import { Users, MessageCircle, Share2, Trophy, Sparkles, TrendingUp } from 'lucide-react';
+import { Users, MessageCircle, Share2, Trophy, Sparkles, TrendingUp, AlertTriangle } from 'lucide-react';
 import CommunityHub from '../../components/CommunityHub';
+import { useState } from 'react';
 
 export default function CommunityPage() {
+  const [error, setError] = useState<string | null>(null);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="flex items-center">
+              <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+              <span className="text-red-700 dark:text-red-300">{error}</span>
+            </div>
+          </div>
+        )}
+
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -121,7 +134,7 @@ export default function CommunityPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <CommunityHub />
+          <CommunityHub onError={setError} />
         </motion.div>
       </div>
     </div>

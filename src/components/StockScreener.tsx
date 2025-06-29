@@ -14,9 +14,10 @@ import { companyInfo } from '@/utils/companyLogos';
 
 interface StockScreenerProps {
   onStockSelect?: (stock: ScreenerResult) => void;
+  onError?: (error: string | null) => void;
 }
 
-const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
+const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect, onError }) => {
   const [results, setResults] = useState<ScreenerResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -121,12 +122,15 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
   const handlePresetScreen = async () => {
     setLoading(true);
     setError(null);
+    if (onError) onError(null);
     
     try {
       const results = await stockScreener.getPresetScreen(selectedPreset);
       setResults(results);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to screen stocks');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to screen stocks';
+      setError(errorMessage);
+      if (onError) onError(errorMessage);
       setResults([]);
     } finally {
       setLoading(false);
@@ -187,13 +191,16 @@ const StockScreener: React.FC<StockScreenerProps> = ({ onStockSelect }) => {
   const handleCustomScreen = async () => {
     setLoading(true);
     setError(null);
+    if (onError) onError(null);
     
     try {
       const builtCriteria = buildCriteriaFromFilters();
       const results = await stockScreener.screenStocks(builtCriteria);
       setResults(results);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to screen stocks');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to screen stocks';
+      setError(errorMessage);
+      if (onError) onError(errorMessage);
       setResults([]);
     } finally {
       setLoading(false);

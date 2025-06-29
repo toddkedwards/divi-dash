@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Award, BarChart3, Info, Plus, Star, Search, Filter, ChevronRight, Target, Users, Zap } from 'lucide-react';
+import { TrendingUp, Award, BarChart3, Info, Plus, Star, Search, Filter, ChevronRight, Target, Users, Zap, AlertTriangle, X, ExternalLink } from 'lucide-react';
 import StockScreener from '@/components/StockScreener';
 import { ScreenerResult, DIVIDEND_ARISTOCRATS, DIVIDEND_KINGS } from '@/utils/stockScreener';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
@@ -11,6 +11,7 @@ const StockScreenerPage = () => {
   const [selectedStock, setSelectedStock] = useState<ScreenerResult | null>(null);
   const [watchlist, setWatchlist] = useState<string[]>([]);
   const [savedScreens, setSavedScreens] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const addToWatchlist = (symbol: string) => {
     if (!watchlist.includes(symbol)) {
@@ -26,9 +27,14 @@ const StockScreenerPage = () => {
   };
 
   React.useEffect(() => {
-    const saved = localStorage.getItem('screener-watchlist');
-    if (saved) {
-      setWatchlist(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('screener-watchlist');
+      if (saved) {
+        setWatchlist(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error('Failed to load watchlist from localStorage:', error);
+      setWatchlist([]);
     }
   }, []);
 
@@ -60,6 +66,16 @@ const StockScreenerPage = () => {
               </div>
             </div>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <div className="flex items-center">
+                <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+                <span className="text-red-700 dark:text-red-300">{error}</span>
+              </div>
+            </div>
+          )}
 
           {/* Enhanced Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
@@ -215,8 +231,11 @@ const StockScreenerPage = () => {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Main Screener - Takes up 3 columns */}
           <div className="xl:col-span-3">
-            <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-6">
-              <StockScreener onStockSelect={setSelectedStock} />
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-700 overflow-hidden">
+              <StockScreener 
+                onStockSelect={setSelectedStock}
+                onError={setError}
+              />
             </div>
           </div>
 
@@ -227,144 +246,109 @@ const StockScreenerPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-6"
+                className="bg-white dark:bg-zinc-800 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-700 p-6"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                        {selectedStock.symbol}
-                      </h3>
-                      {selectedStock.isDividendAristocrat && (
-                        <Award className="h-5 w-5 text-yellow-500" />
-                      )}
-                      {selectedStock.isDividendKing && (
-                        <Award className="h-5 w-5 text-green-600" />
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                      {selectedStock.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
-                      {selectedStock.sector}
-                    </p>
-                  </div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    {selectedStock.symbol} - {selectedStock.name}
+                  </h3>
                   <button
-                    onClick={() => {
-                      if (watchlist.includes(selectedStock.symbol)) {
-                        removeFromWatchlist(selectedStock.symbol);
-                      } else {
-                        addToWatchlist(selectedStock.symbol);
-                      }
-                    }}
-                    className={`p-2 rounded-lg transition-colors ${
-                      watchlist.includes(selectedStock.symbol)
-                        ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400'
-                        : 'bg-gray-100 text-gray-600 dark:bg-zinc-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-600'
-                    }`}
+                    onClick={() => setSelectedStock(null)}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                   >
-                    <Star className={`h-5 w-5 ${watchlist.includes(selectedStock.symbol) ? 'fill-current' : ''}`} />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
-
-                <div className="space-y-4">
-                  {/* Price & Market Cap */}
-                  <div className="bg-gray-50 dark:bg-zinc-700 rounded-xl p-4">
-                    <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
-                      {formatCurrency(selectedStock.price)}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Market Cap: ${(selectedStock.marketCap / 1000000000).toFixed(1)}B
-                    </div>
-                  </div>
-
-                  {/* Dividend Info Grid */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-3">
-                      <div className="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">
-                        Dividend Yield
-                      </div>
-                      <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                        {formatPercent(selectedStock.dividendYield)}
-                      </div>
-                    </div>
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3">
-                      <div className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
-                        Growth Rate
-                      </div>
-                      <div className="text-lg font-bold text-blue-700 dark:text-blue-300">
-                        {formatPercent(selectedStock.dividendGrowth)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Key Metrics */}
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 uppercase tracking-wide">
-                      Key Metrics
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">P/E Ratio</span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          {selectedStock.pe > 0 ? selectedStock.pe.toFixed(1) : 'N/A'}
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Dividend Metrics</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Yield:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {formatPercent(selectedStock.dividendYield)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">ROE</span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          {formatPercent(selectedStock.roe)}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Growth (5Y):</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {formatPercent(selectedStock.dividendGrowth5Y)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Payout Ratio</span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Payout Ratio:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
                           {formatPercent(selectedStock.payoutRatio)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Years of Growth</span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          {selectedStock.yearsOfGrowth}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Valuation</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">P/E Ratio:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {selectedStock.pe.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Price/Book:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {selectedStock.priceToBook.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Market Cap:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {formatCurrency(selectedStock.marketCap)}
                         </span>
                       </div>
                     </div>
                   </div>
-
-                  {/* Overall Score */}
-                  <div className="bg-gray-50 dark:bg-zinc-700 rounded-xl p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Overall Score</span>
-                      <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {selectedStock.overallScore.toFixed(0)}/100
+                  
+                  <div className="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Quality Score</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Overall:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {selectedStock.overallScore.toFixed(1)}/10
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Dividend Safety:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {selectedStock.dividendSafetyScore.toFixed(1)}/10
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Financial Strength:</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {selectedStock.financialStrengthScore.toFixed(1)}/10
+                        </span>
                       </div>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-zinc-600 rounded-full h-2 mb-3">
-                      <div 
-                        className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${selectedStock.overallScore}%` }}
-                      />
-                    </div>
-                    <div className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
-                      selectedStock.recommendation === 'Strong Buy' ? 'text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/20' :
-                      selectedStock.recommendation === 'Buy' ? 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/10' :
-                      selectedStock.recommendation === 'Hold' ? 'text-yellow-700 bg-yellow-100 dark:text-yellow-300 dark:bg-yellow-900/20' :
-                      selectedStock.recommendation === 'Sell' ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/10' :
-                      'text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/20'
-                    }`}>
-                      {selectedStock.recommendation}
-                    </div>
                   </div>
-
-                  {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
-                      Add to Portfolio
-                    </button>
-                    <button className="px-4 py-2 bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors text-sm font-medium">
-                      View Details
-                    </button>
-                  </div>
+                </div>
+                
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={() => addToWatchlist(selectedStock.symbol)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add to Watchlist
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://finance.yahoo.com/quote/${selectedStock.symbol}`, '_blank')}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-zinc-700 text-gray-900 dark:text-gray-100 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View on Yahoo Finance
+                  </button>
                 </div>
               </motion.div>
             )}

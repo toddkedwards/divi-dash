@@ -13,7 +13,8 @@ import {
   Activity,
   RefreshCw,
   DollarSign,
-  Percent
+  Percent,
+  AlertTriangle
 } from 'lucide-react';
 import AdvancedAnalyticsDashboard from '../../components/AdvancedAnalyticsDashboard';
 import AlertsPanel from '../../components/AlertsPanel';
@@ -99,6 +100,7 @@ export default function AdvancedFeaturesPage() {
   const [activeFeature, setActiveFeature] = useState<'analytics' | 'alerts' | 'composition'>('analytics');
   const [isLoading, setIsLoading] = useState(false);
   const [showAlertsModal, setShowAlertsModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const features = [
     {
@@ -155,6 +157,20 @@ export default function AdvancedFeaturesPage() {
     }
   ];
 
+  const handleRefreshData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Simulate data refresh
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      // In a real app, this would fetch fresh data
+    } catch (error) {
+      setError('Failed to refresh data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -170,7 +186,7 @@ export default function AdvancedFeaturesPage() {
             
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => setIsLoading(true)}
+                onClick={handleRefreshData}
                 disabled={isLoading}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
@@ -179,6 +195,16 @@ export default function AdvancedFeaturesPage() {
               </button>
             </div>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <div className="flex items-center">
+                <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+                <span className="text-red-700 dark:text-red-300">{error}</span>
+              </div>
+            </div>
+          )}
 
           {/* Stats Overview */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

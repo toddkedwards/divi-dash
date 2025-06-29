@@ -50,6 +50,7 @@ export default function AIRecommendationsPage() {
   const [selectedRecommendation, setSelectedRecommendation] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<'all' | 'buy' | 'hold' | 'sell'>('all');
   const [confidenceFilter, setConfidenceFilter] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   
   const [recommendationsService] = useState(() => RecommendationsService.getInstance());
 
@@ -69,6 +70,7 @@ export default function AIRecommendationsPage() {
 
   const loadData = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const [recs, divs, opts, insightsData, sentiment] = await Promise.all([
         recommendationsService.generateStockRecommendations(mockPortfolio, 12),
@@ -85,18 +87,48 @@ export default function AIRecommendationsPage() {
       setMarketSentiment(sentiment);
     } catch (error) {
       console.error('Failed to load AI recommendations:', error);
+      setError('Failed to load AI recommendations. Please try again later.');
+      // Set fallback data
+      setRecommendations([]);
+      setDividendPredictions([]);
+      setOptimizations([]);
+      setInsights([]);
+      setMarketSentiment(null);
     } finally {
       setIsLoading(false);
     }
   };
 
   const initializeProfile = () => {
-    let userProfile = recommendationsService.getPersonalizationProfile();
-    if (!userProfile) {
-      userProfile = recommendationsService.generateDemoProfile();
-      recommendationsService.setPersonalizationProfile(userProfile);
+    try {
+      let userProfile = recommendationsService.getPersonalizationProfile();
+      if (!userProfile) {
+        userProfile = recommendationsService.generateDemoProfile();
+        recommendationsService.setPersonalizationProfile(userProfile);
+      }
+      setProfile(userProfile);
+    } catch (error) {
+      console.error('Failed to initialize profile:', error);
+      // Set a default profile
+      setProfile({
+        riskTolerance: 'moderate',
+        investmentGoals: ['income', 'growth'],
+        timeHorizon: 'medium',
+        preferredSectors: ['Technology', 'Healthcare'],
+        avoidedSectors: [],
+        dividendFocus: true,
+        esgPreference: false,
+        portfolioSize: 100000,
+        age: 35,
+        experience: 'intermediate',
+        preferences: {
+          maxPositionSize: 10,
+          minDividendYield: 2,
+          maxPeRatio: 25,
+          preferredMarketCap: ['large', 'mid']
+        }
+      });
     }
-    setProfile(userProfile);
   };
 
   const getRecommendationIcon = (type: StockRecommendation['recommendationType']) => {
@@ -191,6 +223,29 @@ export default function AIRecommendationsPage() {
             <div className="flex items-center justify-center">
               <Brain className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-pulse" />
               <span className="ml-3 text-lg text-gray-600 dark:text-gray-300">AI is analyzing market data and generating recommendations...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-8">
+            <div className="text-center">
+              <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Unable to Load AI Recommendations</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
+              <button 
+                onClick={loadData}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4 inline mr-2" />
+                Try Again
+              </button>
             </div>
           </div>
         </div>

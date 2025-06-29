@@ -43,6 +43,8 @@ interface SyncSchedule {
 
 const IntegrationAutomationPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'real-api' | 'automation' | 'schedules'>('overview');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [automationRules, setAutomationRules] = useState<AutomationRule[]>([
     {
       id: '1',
@@ -97,16 +99,36 @@ const IntegrationAutomationPage: React.FC = () => {
     { id: '4', type: 'sync', message: 'Fidelity sync completed', time: new Date(Date.now() - 10800000), status: 'success' }
   ]);
 
-  const toggleRule = (ruleId: string) => {
-    setAutomationRules(prev => prev.map(rule => 
-      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
-    ));
+  const toggleRule = async (ruleId: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setAutomationRules(prev => prev.map(rule => 
+        rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+      ));
+    } catch (error) {
+      setError('Failed to update automation rule. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const toggleSchedule = (scheduleId: string) => {
-    setSyncSchedules(prev => prev.map(schedule => 
-      schedule.id === scheduleId ? { ...schedule, enabled: !schedule.enabled } : schedule
-    ));
+  const toggleSchedule = async (scheduleId: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setSyncSchedules(prev => prev.map(schedule => 
+        schedule.id === scheduleId ? { ...schedule, enabled: !schedule.enabled } : schedule
+      ));
+    } catch (error) {
+      setError('Failed to update sync schedule. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -148,6 +170,28 @@ const IntegrationAutomationPage: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="flex items-center">
+              <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+              <span className="text-red-700 dark:text-red-300">{error}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+              <div className="flex items-center space-x-3">
+                <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
+                <span className="text-gray-900 dark:text-white">Updating...</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
