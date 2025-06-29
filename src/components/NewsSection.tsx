@@ -515,7 +515,7 @@ export default function NewsSection({
 
           <div className="space-y-3">
             {dividendAlerts.slice(0, 3).map((alert, index) => (
-              <div key={alert.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={`${alert.id}-${index}`} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
                   <Shield className={`w-4 h-4 mr-3 ${
                     alert.dividendSafetyAlert?.riskLevel === 'critical' ? 'text-red-500' :
@@ -675,7 +675,7 @@ export default function NewsSection({
           ) : (
             filteredNews.map((article, index) => (
               <motion.div
-                key={article.id}
+                key={`${article.id}-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}

@@ -240,9 +240,9 @@ class NewsService {
   }
 
   private async processNewsArticles(rawNews: any[], symbol?: string): Promise<NewsArticle[]> {
-    return rawNews.map(article => {
+    return rawNews.map((article, index) => {
       const processed: NewsArticle = {
-        id: `${article.datetime}-${article.headline?.slice(0, 20)}`,
+        id: `${article.datetime}-${article.headline?.replace(/[^a-zA-Z0-9]/g, '')}-${index}`,
         headline: article.headline || 'No headline',
         summary: article.summary || '',
         url: article.url || '',
